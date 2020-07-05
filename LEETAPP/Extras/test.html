@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+var data1= {
+	"name":"hellloSur",
+	"phone":"1243215",
+"address":"abccc",
+"lat":"22412.321",
+"lon":"35113.3215445"
+}
+    // Fire off the request to /form.php
+    request = $.ajax({
+        url: "https://leetintelligence.com:3001/insertperson",
+        contentType: 'application/json',
+        type: "post",
+        data: JSON.stringify(data1)
+    });
+
+    // Callback handler that will be called on success
+    request.done(function (response, textStatus, jqXHR){
+        // Log a message to the console
+        console.log("Hooray, it worked!");
+    });
+
+    // Callback handler that will be called on failure
+    request.fail(function (jqXHR, textStatus, errorThrown){
+        // Log the error to the console
+        console.error(
+            "The following error occurred: "+
+            textStatus, errorThrown
+        );
+    });
+</script>
+</head>
+<body>
+
+<button>Send an HTTP POST request to a page and get the result back</button>
+
+</body>
+</html>

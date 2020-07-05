@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <meta name="description" content="">
+    <title>Covid-19 Maps</title>
+
+    <!-- Load HERE API Code Libraries-->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+    <!-- HERE credentials -->
+    <!-- <script src="credentials.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+    <!-- CSS Files -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+    <script src="../assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+
+    <style>
+        .map {
+            width: 90vw;
+            height: 90vh;
+        }
+
+        .orangefont {
+            color: orange;
+        }
+
+        .greenfont {
+            color: green;
+        }
+
+        .redfont {
+            color: red;
+        }
+
+        .markerscroll {
+            width: 250px;
+            height: 200px;
+            overflow: scroll;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-rose navbar-fixed-top" id="sectionsNav">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><img id="ojLogo" src="../assets/img/logo.jpg"
+                        style=" height: 40px;float: left; margin-right: 7px"></a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a id="cmap" href="#">
+                            <i class="#"></i> Covid World MAP
+                        </a>
+                    </li>
+                    <li>
+                        <a id="clamp" href="#">
+                            <i class="#"></i> Alert Map
+                        </a>
+                    </li>
+                    <li>
+                        <a id="hmap" href="#">
+                            <i class="#"></i> Hospital Map
+                        </a>
+                    </li>
+                    <li>
+                        <a id="uefmap" href="#">
+                            <i class="#"></i> User Entry Form
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="section-space"></div>
+    <div class="container">
+        <div id="map" class="map"></div>
+    </div>
+
+    <script>
+      /*  var url_string = window.location.href;
+        var url = new URL(url_string);
+        var lat = parseFloat(url.searchParams.get("lat"));
+        var lng = parseFloat(url.searchParams.get("lng"));
+        if (lat && lng) {
+            var defaultLat = lat,
+                defaultLng = lng;
+        } else {
+            var defaultLat = 14.075949,
+                defaultLng = 100.614844;
+        }*/
+        $('#cmap').attr('href', 'map.html?lat=' + defaultLat + "&lng=" + defaultLng);
+        $('#uefmap').attr('href', 'UserInput.html?lat=' + defaultLat + "&lng=" + defaultLng);
+        $('#hmap').attr('href', 'HospitalNearBy.html?lat=' + defaultLat + "&lng=" + defaultLng);
+
+
+        //HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+        var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+            REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+        //source https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+        //confirmed https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+        //recovered https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv 
+        //deaths https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+
+        //Get the Lat, Lng of User
+       /* var url_string = window.location.href;
+        var url = new URL(url_string);
+        var lat = parseFloat(url.searchParams.get("lat"));
+        var lng = parseFloat(url.searchParams.get("lng"));
+        if (lat && lng) {
+            var defaultLat = lat,
+                defaultLng = lng;
+        } else {
+            console.log("heere default");
+            var defaultLat = 13.7563,
+                defaultLng = 100.5018;
+        }*/
+        var defaultLat = 13.7563, defaultLng = 100.5018;
+               //### Step 1: Call this function first to find the current poition from HTML5 Geolocation API
+        //Function for get current position (HTML5 Geolocation API)
+       async function findCurrentPosition() {
+            async function success(position) {
+                    defaultLat = parseFloat(position.coords.latitude);
+                    defaultLng = parseFloat(position.coords.longitude);
+            }
+            function error() {
+                alert("Unable to retrieve your location");
+                //document.getElementById('current_position').innerHTML = '<h4>Your position</h4>Unable to retrieve your location';
+            }
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                // document.getElementById('current_position').innerHTML = '<h3>Your position</h3>Geolocation is not supported by your browser';
+            } else {
+                //document.getElementById('current_position').innerHTML = '<h3>Your position</h3>Locating…';
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+        }
+        findCurrentPosition();
+        //Run this function first to get all data from the sources
+        getData();
+
+        async function getData() {
+
+            await $.ajax({
+                type: 'GET',
+                url: 'https://leetintelligence.com:3000/getperson',
+                success: function (response) {
+                    data = response;
+                }
+            });
+
+            //Then get all data, pass all the data to the function addMarkerToMap for show all data as markers on the map
+            await addMarkerToMap(data);
+
+        }
+
+        //Below is the function for create markers and info bubbles
+
+        //Grouping pins and text together
+        var groupMarker = new H.map.Group();
+
+        //Info bubbles
+        groupMarker.addEventListener('tap', function (evt) {
+            var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+                content: evt.target.getData()
+            });
+            //remove info bubble
+            ui.getBubbles().forEach(bub => ui.removeBubble(bub));
+            // show info bubble
+            ui.addBubble(bubble);
+        }, false);
+
+        //Circle marker in SVG
+        var svgMarkup = '<svg width="${markerWidth}" height="${markerHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+            + '<circle cx="${markerCx}" cy="${markerCy}" r="${markerRadius}" fill="red" fill-opacity="40%"/></svg>';
+
+        //Markers
+        function addMarker(icon, coordinate, html) {
+            map.addObject(groupMarker);
+            var marker = new H.map.Marker(coordinate, { icon: icon });
+            marker.setData(html);
+            groupMarker.addObject(marker);
+        }
+
+        //Add markers to map
+        function addMarkerToMap(data) {
+
+            for (var i = 0; i < data.length; i++) {
+
+                // var num = confirmed[i][confirmed[0].length - 1]; //Latest confirmed cases (last column)
+                var markerRadius = 25;
+                var markerWidthHeight = markerRadius * 2;
+
+                var province_state = data[i].address;
+                var lat = data[i].lat;
+                var lng = data[i].lng;
+                var name = data[i].name;
+                var phone = data[i].phone;
+                var fever = data[i].fever;
+                var cough = data[i].cough;
+                var breath = data[i].breath;
+                var pain = data[i].pain;
+                var taste = data[i].taste;
+                var tired = data[i].tired;
+                var location = data[i].location;
+                var travel = data[i].cntry;
+                var adddate = data[i].adddate;
+
+                var symptoms = [];
+
+                if (fever) symptoms.push("Fever ");
+                if (cough) symptoms.push("Cough ");
+                if (breath) symptoms.push("Shortness of Breath ")
+                if (pain) symptoms.push("Pains ");
+                if (taste) symptoms.push("No Taste ");
+                if (tired) symptoms.push("Tired");
+                if (travel) symptoms.push(" <br>Travel From:" + travel);
+
+                //console.log(province_state);
+
+                if (i > 0) {
+                    if (lat == data[i - 1].lat && lng == data[i - 1].lng) {
+                        markerText = markerText + "<hr>" + '<div style="white-space: nowrap">'
+                            + '<span>Province/State: ' + province_state + '</span><br>'
+                            + 'Name: <b>' + name + '</b><br>'
+                            + "Phone: " + phone + '<br>'
+                            + "Type: " + location + '<br>'
+                            + "Symptons: " + symptoms.join() + '<br>'
+                            + "Updated Date: " + adddate
+                            + '</div>'
+
+                    }
+                    else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                        + '<span>Province/State: ' + province_state + '</span><br>'
+                        + 'Name: <b>' + name + '</b><br>'
+                        + "Phone: " + phone + '<br>'
+                        + "Type: " + location + '<br>'
+                        + "Symptons: " + symptoms.join() + '<br>'
+                        + "Updated Date: " + adddate
+                        + '</div>'
+                }
+                else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                    + '<span>Province/State: ' + province_state + '</span><br>'
+                    + 'Name: <b>' + name + '</b><br>'
+                    + "Phone: " + phone + '<br>'
+                    + "Type: " + location + '<br>'
+                    + "Symptons: " + symptoms.join() + '<br>'
+                    + "Updated Date: " + adddate
+                    + '</div>'
+
+                // Not including the cruise ships: Diamond Princess, MS Zaandam (lat = 0, lng = 0).
+                // Due to the data source didn't provide lat/lng.
+                if (lat != 0 && lng != 0) {
+
+
+                    // alert(markerText);
+                    if ((i < data.length - 1 && lat != data[i + 1].lat && lng != data[i + 1].lng) || (i == data.length - 1)) {
+                        //alert(data[i].lat+" - "+data[i+1].lat);
+                        markerText=markerText+"</div>"
+                        var icon = new H.map.Icon(svgMarkup.replace('${markerRadius}', markerRadius).replace('${markerWidth}', markerWidthHeight).replace('${markerHeight}', markerWidthHeight).replace('${markerCx}', markerRadius).replace('${markerCy}', markerRadius), { anchor: { x: markerRadius, y: markerRadius } });
+                        addMarker(icon, { lat: lat, lng: lng }, markerText);
+                    }
+                }
+
+            }
+
+            // map.getViewModel().setLookAtData({
+            //   bounds: groupMarker.getBoundingBox()
+            // });
+        }
+
+
+        //Below is the general scripts of interactive map
+
+        /**
+         * Boilerplate map initialization code starts below:
+         */
+
+        //Step 1: initialize communication with the platform
+        // In your own code, replace variable window.apikey with your own apikey
+        var platform = new H.service.Platform({
+            apikey: JS_APIKEY
+        });
+        var defaultLayers = platform.createDefaultLayers();
+
+        //Step 2: initialize a map - this map is centered over Europe
+        var map = new H.Map(document.getElementById('map'),
+            defaultLayers.vector.normal.map, {
+            center: { lat: defaultLat, lng: defaultLng },
+            zoom: 13,
+            pixelRatio: window.devicePixelRatio || 1
+        });
+        // add a resize listener to make sure that the map occupies the whole container
+        window.addEventListener('resize', () => map.getViewPort().resize());
+
+        //Step 3: make the map interactive
+        // MapEvents enables the event system
+        // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+        // Create the default UI components
+        var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+        // Remove not needed settings control
+        ui.removeControl('mapsettings');
+
+    // Now use the map as required...
+
+
+
+    </script>
+
+</body>
+
+</html>

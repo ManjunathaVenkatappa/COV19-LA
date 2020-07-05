@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Landing Page - COVID</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="vendor/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet"
+    type="text/css">
+
+  <!-- Custom styles for this template -->
+  <link href="css/landing-page.min.css" rel="stylesheet">
+  <!-- Load HERE API Code Libraries-->
+  <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+  <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+  <!-- HERE credentials -->
+  <!-- <script src="credentials.js"></script> -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+  <style>
+    .map {
+      background-color: white;
+      width: 100%;
+      height: 60vh;
+    }
+
+    .orangefont {
+      color: orange;
+    }
+
+    .greenfont {
+      color: green;
+    }
+
+    .redfont {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-light bg-light static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">LEET</a>
+      <a class="btn btn-primary" href="#">COVID MAP</a>
+      <a class="btn btn-primary" href="#">SUPPORT US</a>
+    </div>
+  </nav>
+
+  <!-- Masthead -->
+
+  <header class="masthead text-white text-center">
+
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <h1 class="mb-5">A Location-Based Intelligence to Prevent the Spread of COVID-19 Pandemic!</h1>
+
+          <p class="lead mb-0"> Like any virus, COVID-19 virus spreads in different ways and affects different people
+            that can be predicted
+            if we have spatial location data. Your data. That’s why LEET intelligence developed, a location-based COVID
+            map and APP to alert
+            you about COVID cases in your area and prevent to the spread of virous. </p>
+
+        </div>
+      </div>
+      </form>
+    </div>
+    </div>
+    </div>
+  </header>
+
+  <!-- Icons Grid -->
+  <section class="features-icons bg-light text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="icon-screen-desktop m-auto text-primary"></i>
+            </div>
+            <h3>ALERT MAP</h3>
+            <p class="lead mb-0">Alert Map tells you where COVID-19 cases are in real time so you can avoid those areas
+              or be better prepared if you must travel. You can use Alert Map at any location, any time. </p>
+
+            <div class="col-12 col-md-12">
+              <button type="submit" class="btn btn-block btn-lg btn-primary">COVIDMAP!</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="icon-layers m-auto text-primary"></i>
+            </div>
+            <h3>COVID APP</h3>
+            <p class="lead mb-0"> Should I get tested? Should I go to the hospital? Which one? COVID-19 APP answers
+              these and other critical questions.</p>
+          </div>
+          <div class="col-12 col-md-12">
+            <button type="submit" class="btn btn-block btn-lg btn-primary">COVID APP!</button>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+            <div class="features-icons-icon d-flex">
+              <i class="icon-check m-auto text-primary"></i>
+            </div>
+            <h3>GET TESTED NOW</h3>
+            <p class="lead mb-0">A Responsive WEB and APP for Everyone! Ready to use at any Locaiton to Save the Lives
+              and prevent the spred of COVID19!</p>
+          </div>
+          <div class="col-12 col-md-12">
+            <button type="submit" class="btn btn-block btn-lg btn-primary">DOWNLOAD!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Showcases -->
+  <section class="showcase">
+    <div class="container-fluid p-0">
+      <div class="row no-gutters">
+
+        <div class="col-lg-6 order-lg-2">
+
+          <div id="map" class="map"></div>
+
+        </div>
+        <div class="col-lg-6 order-lg-1 my-auto showcase-text">
+
+          <h2>Real-Time Alert</h2>
+          <p class="lead mb-0">LEET intelligence developed, a location-based COVID map to alert you about COVID cases in
+            your area and prevent to the spread of virous.
+            Organisations can take an action to prevent to the spread of virous before it widespread to other areas </p>
+        </div>
+
+      </div>
+      <div class="row no-gutters">
+        <div class="col-lg-6 text-white showcase-img" style="background-image: url('img/leetcovidapp1.jpg');"></div>
+        <div class="col-lg-6 my-auto showcase-text">
+          <h2> COVID APP</h2>
+          <p class="lead mb-0"> COVID Mobile APP helps you get tested so you can get treatment and isolate yourself at
+            the earliest possible stage if you test positive, or put your mind at ease if you test negative.
+
+          </p>
+
+          <P class="lead mob-o"> Use COVID Mobile APP to report your symptoms to a nearby hospital. The hospitals can
+            access your location and take action to reach you for early treatment which is how we slow the spread.
+            APP alerts hospitals, healthcare clinics and checkpoints at airports , shopping malls, schools and
+            universities about the location of nearby cases so they can take precautions and be prepared.</P>
+
+          <h2> Who should be tested?</h2>
+          <p class="lead mb-0"> Should you get tested? Not everyone needs to. Here is what you need to know about
+            seeking care.
+          <p class="lead mb-0"> • I returned from Travel
+          <p class="lead mb-0"> • I feel so tired
+          <p class="lead mb-0">• I have aches and pains
+          <p class="lead mb-0">• I have a fever
+          <p class="lead mb-0">• I have a cough
+          <p class="lead mb-0">• I have shortness of breathing.
+
+          <P class="lead mob-o">These results will help inform health professionals about your case and about who you
+            may have come in contact with and prevent the spread of the virus.</P>
+          <h2> How to get tested?</h2>
+          <p class="lead mb-0"> If you have symptoms of COVID-19 and want to get tested, the COVID Mobile App will
+            direct you to a nearby hospital or try to call hospitals or local health departments or a medical provider
+            for immediate action. </p>
+          </p>
+
+          <div class="col-12 col-md-12">
+            <button type="submit" class="btn btn-block btn-lg btn-primary">GET TESTED</button>
+
+          </div>
+          </p>
+
+        </div>
+
+        <section class="showcase">
+          <div class="container-fluid p-0">
+            <div class="row no-gutters">
+
+              <div class="col-lg-6 order-lg-2 text-white showcase-img"
+                style="background-image: url('img/COVID_PREVENT.JPG');"></div>
+              <div class="col-lg-6 order-lg-1 my-auto showcase-text">
+
+
+                <h2> Tips for Prevention</h2>
+                <p class="lead mb-0"> Protect yourself, your loved ones and others around you by knowing the facts and
+                  taking appropriate precautions. Follow advice provided by your local public health agency.
+                  To prevent the spread of COVID-19:
+                <p class="lead mb-0"> • Clean your hands often. Use soap and water, or an alcohol-based hand rub.
+                <p class="lead mb-0"> • Maintain a safe distance from anyone who is coughing or sneezing.
+                <p class="lead mb-0"> • Don’t touch your eyes, nose or mouth.
+                <p class="lead mb-0"> • Cover your nose and mouth with your bent elbow or a tissue when you cough or
+                  sneeze.
+                <p class="lead mb-0"> • Stay home if you feel unwell.
+                <p class="lead mb-0"> • If you have a fever, a cough and difficulty breathing, seek medical attention.
+                  Call in advance.
+                <p class="lead mb-0"> • Follow the directions of your local health authority.
+                <p class="lead mb-0"> • Avoiding unneeded visits to medical facilities allows healthcare systems to
+                  operate more effectively, therefore protecting you and others.
+
+                <div class="col-12 col-md-12">
+                  <button type="submit" class="btn btn-block btn-lg btn-primary">GET DIRECT TO HOSPITAL!</button>
+                </div>
+
+                </p>
+
+              </div>
+
+            </div>
+            <div class="row no-gutters">
+              <div class="col-lg-6 text-white showcase-img" style="background-image: url('img/videos.jpg');"></div>
+              <div class="col-lg-6 my-auto showcase-text">
+                <h2> Useful vides to prevention</h2>
+                <p class="lead mb-0">
+
+                <p class="lead mb-0"> • Seven steps to prevent the spread of the virus</p>
+                </p>
+                <p class="lead mb-0"> • How to protect yourself against COVID-19?</p>
+                </p>
+
+                <p class="lead mb-0"> • What is Novel coronavirus (2019-nCoV)?</p>
+                </p>
+
+                </p>
+
+        </section>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+          <ul class="list-inline mb-2">
+            <li class="list-inline-item">
+              <a href="#">About Data</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">About LEET</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Contact</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Terms of Use</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Privacy Policy</a>
+            </li>
+          </ul>
+          <p class="text-muted small mb-4 mb-lg-0">&copy; Copyright © 2020-2021 LEET intelligence All Rights Reserved.
+          </p>
+        </div>
+        <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fab fa-facebook fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fab fa-twitter-square fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fab fa-instagram fa-2x fa-fw"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript">
+
+    //HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+    var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+      REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+    //source https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+    //confirmed https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+    //recovered https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv 
+    //deaths https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+
+    //Run this function first to get all data from the sources
+    getData();
+
+    async function getData() {
+
+      var confirmed, recovered, deaths;
+
+      await $.ajax({
+        type: 'GET',
+        url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+        dataType: 'text',
+        success: function (response) {
+          confirmed = $.csv.toArrays(response);
+        }
+      });
+
+      await $.ajax({
+        type: 'GET',
+        url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
+        dataType: 'text',
+        success: function (response) {
+          recovered = $.csv.toArrays(response);
+        }
+      });
+
+      await $.ajax({
+        type: 'GET',
+        url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+        dataType: 'text',
+        success: function (response) {
+          deaths = $.csv.toArrays(response);
+        }
+      });
+
+      // console.log(confirmed);
+      // console.log(recovered);
+      // console.log(deaths);
+
+      //Then get all data, pass all the data to the function addMarkerToMap for show all data as markers on the map
+      await addMarkerToMap(confirmed, recovered, deaths);
+
+    }
+
+    //Below is the function for create markers and info bubbles
+
+    //Grouping markers and info bubbles together
+    var groupMarker = new H.map.Group();
+
+    //Info bubbles
+    groupMarker.addEventListener('tap', function (evt) {
+      var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+        content: evt.target.getData()
+      });
+      //remove info bubble
+      ui.getBubbles().forEach(bub => ui.removeBubble(bub));
+      // show info bubble
+      ui.addBubble(bubble);
+    }, false);
+
+    //Circle marker in SVG
+    // var svgMarkup = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="48" width="48"><circle cx="24" cy="24" r="20" stroke="white" stroke-width="4" fill="${color}" fill-opacity="70%" /><text x="50%" y="50%" fill="black" dominant-baseline="middle" text-anchor="middle">${num}</text></svg>';
+
+    var svgMarkup = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="48" width="48"><circle cx="24" cy="24" r="24" fill="${color}" fill-opacity="70%" /><text x="50%" y="50%" fill="black" dominant-baseline="middle" text-anchor="middle">${num}</text></svg>';
+
+    //Markers
+    function addMarker(icon, coordinate, html) {
+      map.addObject(groupMarker);
+      var marker = new H.map.Marker(coordinate, { icon: icon });
+      marker.setData(html);
+      groupMarker.addObject(marker);
+    }
+
+    //Add markers to map
+    function addMarkerToMap(confirmed, recovered, deaths) {
+
+      for (var i = 1; i < confirmed.length; i++) {
+
+        var num = confirmed[i][confirmed[0].length - 1]; //Latest confirmed cases (last column)
+
+        var color = numToColorLevel(num);
+        var numK = numToK(num);
+
+        var province_state = confirmed[i][0];
+        var country_region = confirmed[i][1];
+        var title = title_text();
+        var lat = confirmed[i][2];
+        var lng = confirmed[i][3];
+
+        function title_text() {
+          var text;
+          if (province_state == '') {
+            text = country_region;
+          } else {
+            text = country_region + '/' + province_state
+          }
+          return text;
+        }
+
+        //The number of records between the 3 data series are not equal.
+        //So I'm using the first 2 columns (Province/State-array0, Country/Region-array1) as the composite keys.
+        //The main table is time_series_covid19_confirmed_global.csv
+
+
+        var numRecovered;
+        for (var j = 1; j < recovered.length; j++) {
+          if (recovered[j][0] == province_state && recovered[j][1] == country_region) {
+            numRecovered = recovered[j][recovered[0].length - 1];
+          }
+        }
+
+        var numDeaths;
+        for (var k = 1; k < deaths.length; k++) {
+          if (deaths[k][0] == province_state && deaths[k][1] == country_region) {
+            numDeaths = deaths[k][deaths[0].length - 1];
+          }
+        }
+
+        // Not including the cruise ships: Diamond Princess, MS Zaandam (lat = 0, lng = 0).
+        // Due to the data source didn't provide lat/lng.
+        if (lat != 0 && lng != 0) {
+
+          var icon = new H.map.Icon(svgMarkup.replace('${color}', color).replace('${num}', numK), { anchor: { x: 24, y: 24 } });
+          addMarker(icon, { lat: lat, lng: lng },
+            '<div style="white-space: nowrap">'
+            + '<span><b>' + title + '</b></span><br>'
+            + '<hr>'
+            + '<span class="orangefont">Confirmed: ' + num + '</span><br>'
+            + '<span class="greenfont">Recovered: ' + numRecovered + '</span><br>'
+            + '<span class="redfont">Deaths: ' + numDeaths + '</span>'
+            + '</div>'
+          );
+
+        }
+
+      }
+
+      // map.getViewModel().setLookAtData({
+      //   bounds: groupMarker.getBoundingBox()
+      // });
+    }
+
+    //Symbolize the markers by number of the latest confirmed cases
+    function numToColorLevel(num) {
+      if (num <= 10) {
+        color = 'LightBlue';
+      } else if (num > 10 && num <= 100) {
+        color = 'LightGreen';
+      } else if (num > 100 && num <= 1000) {
+        color = 'Yellow';
+      } else if (num > 1000 && num <= 10000) {
+        color = 'Orange';
+      } else if (num > 10000 && num <= 100000) {
+        color = 'OrangeRed';
+      } else if (num > 100000) {
+        color = 'Red';
+      }
+      return color;
+    }
+
+    function numToK(num) {
+      if (num <= 999) {
+        numK = num;
+      } else if (num > 999) {
+        numK = (num / 1000);
+        numK = numK.toFixed(0);
+        numK = numK + 'K'
+      }
+      return numK;
+    }
+
+    //https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/reduced.day/14/4823/6160/256/png8?apiKey={YOUR_API_KEY}
+
+    //Below is the general scripts of interactive map
+
+    /**
+     * Boilerplate map initialization code starts below:
+     */
+
+    //Step 1: initialize communication with the platform
+    // In your own code, replace variable window.apikey with your own apikey
+    var platform = new H.service.Platform({
+      apikey: JS_APIKEY
+    });
+    var defaultLayers = platform.createDefaultLayers();
+
+    //Step 2: initialize a map - this map is centered over Europe
+    var map = new H.Map(document.getElementById('map'),
+      defaultLayers.vector.normal.map, {
+      center: { lat: 0, lng: 0 },
+      zoom: 1,
+      pixelRatio: window.devicePixelRatio || 1
+    });
+    // add a resize listener to make sure that the map occupies the whole container
+    window.addEventListener('resize', () => map.getViewPort().resize());
+
+    //Step 3: make the map interactive
+    // MapEvents enables the event system
+    // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+    var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+    // Create the default UI components
+    var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+    // Remove not needed settings control
+    ui.removeControl('mapsettings');
+
+    // Now use the map as required...
+
+    setBaseLayer(map, platform);
+    function setBaseLayer(map, platform) {
+      var mapTileService = platform.getMapTileService({
+        type: 'base'
+      });
+      var parameters = {};
+      var tileLayer = mapTileService.createTileLayer(
+        'maptile',
+        'reduced.day', //change scheme here 
+        256,
+        'png8',
+        parameters
+      );
+      map.setBaseLayer(tileLayer);
+    }
+
+    // normal.day
+    // normal.day.grey
+    // normal.day.transit
+    // normal.day.custom
+    // normal.night
+    // normal.night.grey
+    // pedestrian.day
+    // pedestrian.day.mobile
+    // pedestrian.night
+    // pedestrian.night.mobile
+    // carnav.day.grey
+    // normal.day.mobile
+    // normal.day.grey.mobile
+    // normal.day.transit.mobile
+    // normal.night.mobile
+    // normal.night.grey.mobile
+    // reduced.day
+    // reduced.night
+    // normal.traffic.day
+    // normal.traffic.night
+    // normal.night.transit
+    // normal.night.transit.mobile
+
+  </script>
+</body>
+
+</html>

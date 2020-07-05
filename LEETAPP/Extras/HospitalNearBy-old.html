@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <meta name="description" content="">
+    <title>Find nearby hospitals from your current position</title>
+
+    <!-- Load HERE API Code Libraries-->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+    <!-- HERE credentials -->
+    <!-- Get your credentials from https://developer.here.com -->
+    <!-- <script src="credentials.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script> -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+    <script src="assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+
+    <style>
+        .body {
+            font-family: Helvetica;
+            font-size: 12px;
+            color: #3f454d;
+        }
+
+        .map {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: white;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .panel {
+            position: fixed;
+            left: 10px;
+            background-color: white;
+            padding: 50px 10px;
+            min-width: 200px;
+            height: 80%;
+            resize: both;
+            overflow: hidden;
+            box-shadow: 0em 0 0.4em 0 rgba(15, 22, 33, 0.6);
+            border-radius: 0.5em;
+        }
+
+        .nearby_hospitals {
+            overflow: auto;
+            width: 100%;
+            height: 70%;
+        }
+
+        .toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: white;
+            color: #3f454d;
+            border: none;
+            text-align: center;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0em 0 0.4em 0 rgba(15, 22, 33, 0.6);
+            border-radius: 0.5em;
+        }
+    </style>
+
+</head>
+
+<body class="body">
+        <nav class="navbar navbar-rose navbar-fixed-top" id="sectionsNav">
+                <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">LEET Covid Awareness App</a>
+                    </div>
+        
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="UserNearBy.html">
+                                    <i class="#"></i> MAP
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="#"></i> User Entry Form
+                                </a>
+                            </li>
+                            <li>
+                                <a href="HospitalForm.html">
+                                    <i class="#"></i> Hospital Entry Form
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="section-space"></div>
+            <div class="container">
+    <!-- DIV for map display -->
+    <div id="map" class="map"></div>
+
+    <!-- DIV for text panel -->
+    <div id="panel" class="panel">
+        <br>
+        <button onclick="removeResult();findCurrentPosition()">Click to get your location</button>
+        <!-- Display the current position from HTML5 Geolocation API and Reverse Geocode result from HERE Geocoder API -->
+        <div id="current_position"></div>
+        <!-- Display nearby hospitals found from HERE Places (Search) API -->
+        <div id="result_title"></div>
+        <div id="nearby_hospitals" class="nearby_hospitals"></div>
+    </div>
+
+    <!-- The button for hide-Show the panel  -->
+    <button class="toggle" onclick="togglePanel()" style="margin-top: 50px;">☰</button>
+            </div>
+    <script type="text/javascript">
+
+        //HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+        var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+            REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+        var groupMarker = new H.map.Group(), //The group holding markers on the map 
+            groupRoute = new H.map.Group(), //The group holding routing lines on the map 
+            route = []; //The array to store routing calculation results for genearte routing lines
+
+        function removeResult() {
+            groupMarker.removeAll(); //Remove all previous markers before the new request 
+            groupRoute.removeAll(); //Remove the previous routing line before the new request 
+            route = []; //Clear the previous routing calculation results
+
+            //Remove all previous texts in the panel before the new request
+            var div1 = document.getElementById('current_position');
+            while (div1.firstChild) {
+                div1.removeChild(div1.firstChild);
+            }
+            var div2 = document.getElementById('result_title');
+            while (div2.firstChild) {
+                div2.removeChild(div2.firstChild);
+            }
+            var div3 = document.getElementById('nearby_hospitals');
+            while (div3.firstChild) {
+                div3.removeChild(div3.firstChild);
+            }
+        }
+
+        //Remove the previous routing line before draw another routing line
+        function removeRoute() {
+            groupRoute.removeAll();
+        }
+
+        //Hide-Show the panel 
+        function togglePanel() {
+            var x = document.getElementById("panel");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        //### Step 1: Call this function first to find the current poition from HTML5 Geolocation API
+        //Function for get current position (HTML5 Geolocation API)
+        function findCurrentPosition() {
+            async function success(position) {
+                var lat = position.coords.latitude,
+                    lng = position.coords.longitude,
+                    address;
+
+                //### Step 2: If succeed to get the current position, then call the next functions
+                //### Step 2-1: Call this function (Reverse Geocode - HERE Geocoder API) to get the address at the current position and display on the div id "current_position"
+                await reverseGeocode(function (data) {
+                    address = data.Response.View[0].Result[0].Location.Address.Label;
+                    var content = '<h3>Your position</h3>'
+                        + lat.toFixed(5) + ',' + lng.toFixed(5)
+                        + '<br>' + address
+                        + '<br><a href="#" onclick="map.setCenter({ lat: ' + lat + ', lng: ' + lng + ' });map.setZoom(14)">Pan To</a>';
+                    document.getElementById('current_position').innerHTML = content;
+                }, lat, lng);
+
+                //### Step 2-2: Call this function to set center and zoom the map to the current position
+                moveMapToCurrentPosition(map, lat, lng);
+                //### Step 2-3: Call this function to add the current position marker to the map
+                addCurrentPositionMarker(map, lat, lng, address);
+
+                //### Step 3: Call this function to find nearby hospitals from HERE Places (Search) API
+                placesSearch(function (data) {
+                    //console.log(data)
+                    //### Step 4: When get the result, call this function to create a new data structure for easy to use later
+                    createNewData(data);
+                }, lat, lng);
+            }
+            function error() {
+                document.getElementById('current_position').innerHTML = '<h3>Your position</h3>Unable to retrieve your location';
+            }
+            if (!navigator.geolocation) {
+                document.getElementById('current_position').innerHTML = '<h3>Your position</h3>Geolocation is not supported by your browser';
+            } else {
+                document.getElementById('current_position').innerHTML = '<h3>Your position</h3>Locating…';
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+        }
+
+        //Reverse Geocode - HERE Geocoder API
+        function reverseGeocode(callback, lat, lng) {
+            return $.ajax({
+                url: 'https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json',
+                type: 'GET',
+                dataType: 'jsonp',
+                jsonp: 'jsoncallback',
+                data: {
+                    prox: lat + ',' + lng + ',250',
+                    mode: 'retrieveAddresses',
+                    maxresults: '1',
+                    gen: '9',
+                    // language: 'en-US',
+                    apiKey: REST_APIKEY
+                },
+                success: function (data) {
+                    //console.log(data);
+                    callback(data);
+                }
+            });
+        }
+
+        //Set center and zoom the map to the current position
+        function moveMapToCurrentPosition(map, lat, lng) {
+            map.setCenter({ lat: lat, lng: lng });
+            map.setZoom(14);
+        }
+
+        //Info bubbles for all markers on the map
+        groupMarker.addEventListener('tap', function (evt) {
+            var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+                content: evt.target.getData()
+            });
+            //remove info bubble
+            ui.getBubbles().forEach(bub => ui.removeBubble(bub));
+            //show info bubble
+            ui.addBubble(bubble);
+        }, false);
+
+        //Add the current position marker to the map
+        function addCurrentPositionMarker(map, lat, lng, address) {
+            map.addObject(groupMarker);
+            var svgMarkup = '<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="48" width="48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="-44 0 38.4 38.4"><path style="fill:#ef5959" d="m-24.662 37.77c8.341 0 15.108-1.6933 15.108-3.777 0-1.8188-5.1621-3.3421-12.024-3.7014-1.0279 1.0795-1.8971 1.9377-2.4467 2.4676 1.429 0.11957 2.5116 0.62951 2.5116 1.2338 0 0.69252-1.4099 1.259-3.1475 1.259-1.7373 0-3.1475-0.5665-3.1475-1.259 0-0.6043 1.0829-1.1142 2.5119-1.2338-0.54959-0.52992-1.4192-1.385-2.447-2.4676-6.8653 0.35932-12.027 1.8827-12.027 3.7014 0 2.0837 6.7672 3.777 15.108 3.777z"/><path style="fill:#ffda44" d="m-24.662 33.364s-0.22654-0.21393-0.62951-0.6043h-0.0061c-1.429 0.11957-2.5119 0.62951-2.5119 1.2338 0 0.69252 1.4102 1.259 3.1475 1.259s3.1475-0.5665 3.1475-1.259c0-0.6043-1.0829-1.1142-2.5119-1.2338h-0.0061c-0.40297 0.39037-0.62951 0.6043-0.62951 0.6043z"/><path style="fill:#ffda44" d="m-24.662 0.62951c-7.3011 0-13.22 5.9185-13.22 13.22 0 7.3024 13.22 19.515 13.22 19.515s13.22-12.212 13.22-19.515c0-7.3011-5.9185-13.22-13.22-13.22z"/><path style="fill:#a5d0f2" d="m-19.626 13.22c0 2.7815-2.2546 5.0361-5.0361 5.0361s-5.0361-2.2546-5.0361-5.0361 2.2546-5.0361 5.0361-5.0361 5.0361 2.2546 5.0361 5.0361z"/><g style="fill:#231f20" transform="matrix(.078689 0 0 .078689 -40.4 .00000224)"><path d="m272 168c0-39.766-32.234-72-72-72s-72 32.234-72 72 32.234 72 72 72c39.746-0.0469 71.953-32.254 72-72zm-128 0c0-30.93 25.07-56 56-56s56 25.07 56 56-25.07 56-56 56c-30.914-0.0352-55.965-25.086-56-56z"/><path d="m256.66 378.1c50.88-54.98 119.34-140.43 119.34-202.1 0-97.203-78.8-176-176-176s-176 78.797-176 176c0 61.67 68.465 147.12 119.34 202.1-69.586 5.4-143.34 22.1-143.34 53.9 0 36.801 100.62 56 200 56 99.383 0 200-19.199 200-56 0-31.801-73.754-48.496-143.34-53.902zm-56.66-362.1c88.324 0.10156 159.9 71.676 160 160 0 76.664-124.3 202.32-155.2 232.32l-2.3281 2.2539-2.4024 2.3555-2.3984-2.3555-2.6484-2.4844c-31.32-30.39-155.02-155.61-155.02-232.09 0.102-88.324 71.68-159.9 160-160zm-10.922 408.62 2.1289 2.0391c2.1289 2.0469 3.2969 3.1524 3.2969 3.1524l5.49 5.19 5.4961-5.1836s1.1367-1.0742 3.1992-3.082l2.168-2.0781c7.5508 0.26953 14.836 2.8359 20.891 7.3594-2.1445 2.6406-13.113 8-31.777 8s-29.602-5.3438-31.777-8c6.0391-4.543 13.328-7.125 20.879-7.3906zm10.92 47.38c-112.32 0-184-23.69-184-40 0-13.016 49.223-33.504 141.6-38.809 6.4531 6.7188 12.383 12.719 17.598 17.93-14.47 4-23.2 11.58-23.2 20.88 0 16.488 24.879 24 48 24s48-7.5117 48-24c0-9.2461-8.625-16.801-23.246-20.801 5.25-5.22 11.2-11.24 17.68-17.99 92.35 5.29 141.57 25.77 141.57 38.79 0 16.312-71.68 40-184 40z"/></g></svg>';
+            var icon = new H.map.Icon(svgMarkup),
+                marker = new H.map.Marker({ lat: lat, lng: lng }, { icon: icon }),
+                html = '<div style="white-space:nowrap;font-family:Helvetica;font-size:12px;">'
+                    + '<h3>Your position</h3>'
+                    + lat.toFixed(5) + ',' + lng.toFixed(5)
+                    + '<br>' + address
+                    + '</div>'
+            marker.setData(html);
+            groupMarker.addObject(marker);
+        }
+
+        //HERE Places (Search) API
+        function placesSearch(callback, lat, lng) {
+            return $.ajax({
+                url: 'https://places.ls.hereapi.com/places/v1/discover/explore',
+                type: 'GET',
+                data: {
+                    at: lat + ',' + lng,
+                    //  cat: 'hospital-health-care-facility',
+                    cat: 'hospital',
+                    tf: 'plain',
+                    apiKey: REST_APIKEY
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    // xhr.setRequestHeader('Accept-Language', 'en-US');
+                },
+                success: function (data) {
+                    //console.log(data);
+                    callback(data);
+                }
+            });
+        }
+
+        //HERE Places (Search) API - Get more rich content from HERE Places (Search) API
+        function placesLookup(callback, id) {
+            return $.ajax({
+                url: 'https://places.ls.hereapi.com/places/v1/places/lookup',
+                type: 'GET',
+                data: {
+                    source: 'sharing',
+                    id: id,
+                    tf: 'plain',
+                    apiKey: REST_APIKEY
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Accept', 'application/json');
+                    // xhr.setRequestHeader('Accept-Language', 'en-US');
+                },
+                success: function (data) {
+                    //console.log(data);
+                    callback(data);
+                }
+            });
+        }
+
+        //HERE Routing API
+        function routing(callback, s_lat, s_lng, d_lat, d_lng) {
+            return $.ajax({
+                url: 'https://route.ls.hereapi.com/routing/7.2/calculateroute.json',
+                type: 'GET',
+                dataType: 'jsonp',
+                jsonp: 'jsoncallback',
+                data: {
+                    waypoint0: s_lat + ',' + s_lng,
+                    waypoint1: d_lat + ',' + d_lng,
+                    mode: 'fastest;car;traffic:enabled',
+                    departure: 'now',
+                    maneuverattributes: 'direction,action',
+                    routeattributes: 'waypoints,summary,shape,legs,groups',
+                    legattributes: 'maneuvers',
+                    // language: 'en-us',
+                    apiKey: REST_APIKEY
+                },
+                success: function (data) {
+                    // console.log(data);
+                    callback(data);
+                }
+            });
+        }
+
+        //### Function for create a new data structure for easy to use later
+        async function createNewData(data) {
+
+            //placesGeoJSON - data in GeoJSON format
+            var placesGeoJSON = {
+                "type": "FeatureCollection",
+                "features": []
+            };
+
+            //### Step 4-1: Check if found hospitals, then run the next process
+            if (data.length > 0) {
+                //This process may take a while, depending on the number of locations discovered.
+                //So, it should display something to tell the user that the application is in-processing.
+                document.getElementById('nearby_hospitals').innerHTML = '<h3>Nearby hospitals</h3>Processing...';
+
+                //Your current position
+                var s_lat = lat,
+                    s_lng = lng;
+
+                //### Step 4-2: Get "id" from the Places (Search) results to get more rich content from HERE Places (Search) API
+                for (var i = 0; i < data.length; i++) {
+                    var id, d_lat, d_lng, name, alternativeNames = [], address, phone = [], distance, travelTime, sharing;
+                    //"id" to query more rich content
+                    id = data[i].ID,
+                        //Positions of hospitals found
+                        d_lat = data[i].lat,
+                        d_lng = data[i].lng;
+
+                    //### Step 4-3: Call this function to get more rich content
+                    await placesLookup(function (lookup) {
+                        //console.log(lookup);
+                        sharing = lookup.view; //link to HERE Wego
+                        name = lookup.name;
+                        alternativeNames = [];
+                        try {
+                            for (var j = 0; j < lookup.alternativeNames.length; j++) {
+                                alternativeNames.push(lookup.alternativeNames[j].name);
+                            }
+                        } catch (err) { }
+                        address = lookup.location.address.text;
+                        phone = [];
+                        try {
+                            for (var k = 0; k < lookup.contacts.phone.length; k++) {
+                                phone.push(lookup.contacts.phone[k].value);
+                            }
+                        } catch (err) { }
+                    }, id);
+
+                    //### Step 4-4: Call this function to routing (from your current position to all hospitals found) from HERE Routing API
+                    await routing(function (thisRoute) {
+                        //console.log(thisRoute);
+                        distance = thisRoute.response.route[0].summary.distance;
+                        travelTime = thisRoute.response.route[0].summary.travelTime;
+
+                        //console.log(route);
+                        route.push(thisRoute.response.route[0]);
+
+                    }, s_lat, s_lng, d_lat, d_lng);
+
+                    //### Step 4-4: Push the content (hospitals found and routing data from the current position) 
+                    placesGeoJSON.features.push({
+                        "type": "Feature",
+                        "properties": {
+                            "id": id,
+                            "name": name,
+                            "alternativeNames": alternativeNames,
+                            "address": address,
+                            "phone": phone,
+                            "distance": distance,
+                            "travelTime": travelTime,
+                            "sharing": sharing
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [d_lng, d_lat]
+                        }
+                    });
+
+                }
+                //console.log(placesGeoJSON);
+                //### Step 5: When complete, call this function to bring them to display on the panel and the map
+                await displayResult(placesGeoJSON);
+            } else {
+                document.getElementById('nearby_hospitals').innerHTML = '<h3>Nearby hospitals</h3>No nearby hospitals found!';
+            }
+        }
+
+        //Function for display the results on the panel and the map
+        async function displayResult(data) {
+
+            //### Step 5-1: Display the results on the panel
+            document.getElementById('result_title').innerHTML = '<h3>Nearby hospitals</h3>';
+            var content = '';
+
+            //Loop from placesGeoJSON (data in GeoJSON format) 
+            for (var i = 0; i < data.features.length; i++) {
+
+                var lat = data.features[i].geometry.coordinates[1],
+                    lng = data.features[i].geometry.coordinates[0],
+                    name = data.features[i].properties.name,
+                    alternativeNames = data.features[i].properties.alternativeNames,
+                    address = data.features[i].properties.address,
+                    phone = data.features[i].properties.phone,
+                    distance = data.features[i].properties.distance,
+                    travelTime = data.features[i].properties.travelTime,
+                    sharing = data.features[i].properties.sharing;
+
+                //### Step 5-1-1: Content for display the results on the panel
+                content += '<p>'
+                    + '<b>' + (i + 1) + '.&nbsp;' + name + '</b>'
+                    + '<br><i>' + getAltNames() + '</i>'
+                    + address
+                    + '<br>' + getPhones()
+                    + '<br>' + distance.toKM() + '&nbsp;|&nbsp;' + travelTime.toHHMM() + '&nbsp;'
+                    + '<br><a href="#" onclick="map.setCenter({ lat: ' + lat + ', lng: ' + lng + ' });map.setZoom(14)">Pan To</a>'
+                    //### Step 6: Click to call this function to display routing line from your current position to a selected hospital
+                    + '&nbsp;|&nbsp;<a href="#" onclick="drawRoute(' + i + ')">Route</a>'
+                    + '&nbsp;|&nbsp;<a href="' + sharing + '" target="_blank">HERE WeGo</a>'
+                    + '&nbsp;|&nbsp;<a href="https://maps.google.com?q=' + lat + ',' + lng + '" target="_blank">Google Maps</a>'
+                    + '</p>';
+
+                //### Step 5-2: Call this function to add the hospitals found markers to the map with the content in info bubbles
+                var svgMarkup = '<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="48" width="48" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="-46 0 38.4 38.445066"><path style="fill:#a5d0f2" d="m-26.612 0.63471c-7.3615 0-13.329 5.9675-13.329 13.329 0 7.3627 13.329 23.484 13.329 23.484s13.329-16.122 13.329-23.484c0-7.3615-5.9678-13.329-13.329-13.329z"/><path style="fill:#fff" d="m-26.612 29.197c0 4.557 3.6942 8.2513 8.2513 8.2513 4.557 0 8.2513-3.6942 8.2513-8.2513 0-4.557-3.6942-8.2513-8.2513-8.2513-4.557 0-8.2513 3.6942-8.2513 8.2513zm14.16-2.1009-7.1786 7.1786-4.4876-4.4873 1.7963-1.7963 2.6913 2.691 5.3886-5.3824z"/><path style="fill:#fff" d="m-22.322 27.991-1.7963 1.7963 4.4876 4.4873 7.1786-7.1786-1.7901-1.7963-5.3886 5.3824z"/><path d="m-14.82 21.052c1.4352-2.9089 2.1716-5.2959 2.1716-7.0878 0-7.712-6.252-13.964-13.964-13.964s-13.964 6.2517-13.964 13.964c0 7.505 12.924 23.223 13.474 23.889l0.48998 0.59256 0.48936-0.59318c0.0074-0.0096 0.6843-0.83275 1.7135-2.1614 2.586 2.4127 6.357 3.0608 9.6 1.6494 3.243-1.4111 5.339-4.6125 5.3356-8.1493-0.00341-3.5368-2.1056-6.7339-5.3514-8.1391zm-11.792 15.387c-2.3898-2.982-12.694-16.208-12.694-22.475 0-7.011 5.6833-12.694 12.694-12.694s12.694 5.6833 12.694 12.694c0 1.6255-0.71529 3.8718-2.1099 6.6682-3.7116-1.0184-7.6565 0.47263-9.7668 3.6911-2.1105 3.2188-1.9048 7.4309 0.50889 10.429-0.5498 0.70971-1.0091 1.2924-1.3265 1.6872zm8.2513 0.37438c-4.2065 0-7.6166-3.41-7.6166-7.6166 0-4.2065 3.41-7.6166 7.6166-7.6166 4.2065 0 7.6166 3.41 7.6166 7.6166-0.0046 4.2047-3.4119 7.6119-7.6166 7.6166z" style="fill:#231f20"/><polygon style="stroke:#231f20;stroke-width:51.2;fill:#ef5959" points="159.87 0 159.87 159.87 0 159.87 0 352.13 159.87 352.13 159.87 512 352.13 512 352.13 352.13 512 352.13 512 159.87 352.13 159.87 352.13 0" transform="matrix(.031287 0 0 .031287 -34.809 4.0047)"/><text style="text-align:center;font-size:10px;letter-spacing:0px;line-height:100%;word-spacing:0px;font-family:&apos;MS Sans Serif&apos;;fill:#000000" xml:space="preserve" y="32.5" x="-23">${label}</text></svg>';
+                //Replace ${label} in the SVG Markup for display with index number of the hospitals found 
+                var icon = new H.map.Icon(svgMarkup.replace('${label}', i + 1));
+                addPlacesMarker(icon, { lat: lat, lng: lng },
+                    //HTML content for info bubbles
+                    '<div style="white-space:nowrap;font-family:Helvetica;font-size:12px;">'
+                    + '<b>' + (i + 1) + '.&nbsp;' + name + '</b>'
+                    + '<br><i>' + getAltNames() + '</i>'
+                    + address
+                    + '<br>' + getPhones()
+                    + '<br>' + distance.toKM() + '&nbsp;|&nbsp;' + travelTime.toHHMM() + '&nbsp;'
+                    //### Step 6: Click to call this function to display routing line from your current position to a selected hospital
+                    + '<br><a href="#" onclick="drawRoute(' + i + ')">Route</a>'
+                    + '&nbsp;|&nbsp;<a href="' + sharing + '" target="_blank">HERE WeGo</a>'
+                    + '&nbsp;|&nbsp;<a href="https://maps.google.com?q=' + lat + ',' + lng + '" target="_blank">Google Maps</a>'
+                    + '</div>'
+                );
+
+                //Get alternative names form the array for display
+                function getAltNames() {
+                    var altNames = '';
+                    for (var j = 0; j < alternativeNames.length; j++) {
+                        altNames += alternativeNames[j] + '<br>';
+                    }
+                    return altNames;
+                }
+
+                //Get phone numbers form the array for display
+                function getPhones() {
+                    var phones = '';
+                    for (var k = 0; k < phone.length; k++) {
+                        phones += '<a href="tel:' + phone[k] + '">' + phone[k] + '</a>&nbsp;'
+                    }
+                    return phones;
+                }
+            }
+            //Display the results on the panel
+            document.getElementById('nearby_hospitals').innerHTML = content;
+            //Zooming to a Set of Markers
+            map.getViewModel().setLookAtData({
+                bounds: groupMarker.getBoundingBox()
+            });
+        }
+
+        //Convert routing distance from Meters for display
+        Number.prototype.toKM = function () {
+            distance = this;
+            return (distance / 1000).toFixed(2) + ' km';
+        }
+
+        //Convert routing time from Milliseconds to Hours for display
+        Number.prototype.toHHMM = function () {
+            function addZeroBefore(n) {
+                return (n < 10 ? '0' : '') + n;
+            }
+            totalSeconds = this;
+            hours = Math.floor(totalSeconds / 3600);
+            totalSeconds %= 3600;
+            minutes = Math.floor(totalSeconds / 60);
+            return addZeroBefore(hours) + ":" + addZeroBefore(minutes) + " hr";
+        }
+
+        //Function for add hospitals found markers to the map
+        function addPlacesMarker(icon, coordinate, html) {
+            map.addObject(groupMarker);
+            var marker = new H.map.Marker(coordinate, { icon: icon });
+            marker.setData(html);
+            groupMarker.addObject(marker);
+        }
+
+        //Functions for display routing line from your current position to a selected hospital
+        function drawRoute(ind) {
+            //Remove the previous routing line before draw another routing line
+            removeRoute();
+            //### Step 6-1: Call this function to draw routing line on the map
+            addRouteShapeToMap(route[ind]);
+        }
+
+        function addRouteShapeToMap(route) {
+            var lineString = new H.geo.LineString(),
+                routeShape = route.shape,
+                polyline;
+
+            routeShape.forEach(function (point) {
+                var parts = point.split(',');
+                lineString.pushLatLngAlt(parts[0], parts[1]);
+            });
+
+            polyline = new H.map.Polyline(lineString, {
+                style: {
+                    lineWidth: 4,
+                    strokeColor: 'rgba(102, 0, 51, 0.7)'
+                }
+            });
+            // Add the polyline to the map
+            groupRoute.addObject(polyline);
+            map.addObject(groupRoute);
+
+            // And zoom to its bounding rectangle
+            map.getViewModel().setLookAtData({
+                bounds: polyline.getBoundingBox()
+            });
+        }
+
+        //Below is the general scripts of interactive map
+
+        /**
+         * Boilerplate map initialization code starts below:
+         */
+
+        //Step 1: initialize communication with the platform
+        // In your own code, replace variable window.apikey with your own apikey
+        var platform = new H.service.Platform({
+            apikey: JS_APIKEY
+        });
+        var defaultLayers = platform.createDefaultLayers();
+
+        //Step 2: initialize a map - this map is centered over Europe
+        var map = new H.Map(document.getElementById('map'),
+            defaultLayers.vector.normal.map, {
+            center: { lat: 0, lng: 0 },
+            zoom: 1,
+            pixelRatio: window.devicePixelRatio || 1
+        });
+        // add a resize listener to make sure that the map occupies the whole container
+        window.addEventListener('resize', () => map.getViewPort().resize());
+
+        //Step 3: make the map interactive
+        // MapEvents enables the event system
+        // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+        // Create the default UI components
+        var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+    // Remove not needed settings control
+    // ui.removeControl('mapsettings');
+
+    // Now use the map as required...
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
+	<link rel="icon" type="image/png" href="assets/img/favicon.png">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<title>LEET Covid</title>
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+	<!-- Load HERE API Code Libraries-->
+	<link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+	<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+
+	<!-- HERE credentials -->
+	<!-- <script src="credentials.js"></script> -->
+
+	<!--     Fonts and icons     -->
+	<link rel="stylesheet" type="text/css"
+		href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script> -->
+
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+	<script src="assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+	<script src="assets/Chart.min.js"></script>
+	<script src="assets/utils.js"></script>
+
+	<style>
+		.map {
+			background-color: white;
+			width: 100%;
+			height: 40vh;
+		}
+	</style>
+</head>
+
+<body class="section-white">
+
+	<div id="navbarjs"></div>
+
+
+	<!--     *********     HEADER 1      *********      -->
+	<div class="page-header header-filter" style="background-image: url('assets/img/cmap2.jpg');">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6">
+					<h3 class="title">Location-Based Intelligence </h3>
+					<h4>Preventing the spread of COVID-19 with location-based data.</h4>
+					<h5>Like any virus, COVID-19 travels along vectors or pathways that can be predicted– if you have
+						spatial location data and an app to display it. That’s why LEETintelligence developed a
+						location-based COVID-19 map and Mobile APP to alert you about COVID-19 cases in your area so you
+						can be prepared and take action to prevent the spread of infections.</h5>
+					<br />
+					<a href="https://leetintelligence.com/LEETAPP/map.html" target="_blank" class="btn btn-info btn-lg">
+						<i class="fa fa-ticket"></i> Covid World Map
+					</a>
+				</div>
+				<div class="col-md-5 col-md-offset-1">
+					<div class="iframe-container">
+						<iframe src="https://www.youtube.com/embed/TjcoN9Aek24" frameborder="0" allowfullscreen
+							height="250"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--     *********    END HEADER 1      *********      -->
+
+	<div class="cd-section" id="features">
+
+		<!--     *********     FEATURES 5      *********      -->
+
+		<div class="features-5" style="background-image: url('assets/img/bg9.jpg')">
+
+			<div class="col-md-8 col-md-offset-2 text-center">
+				<h2 class="title">Applications</h2>
+			</div>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-4">
+						<div class="info">
+							<div class="icon">
+								<i class="material-icons">map</i>
+							</div>
+							<h4 class="info-title">ALERT MAP</h4>
+							<p>Alert Map tells you where COVID-19 cases are in real time so you can avoid those areas or
+								be better prepared if you must travel. You can use Alert Map at any location, any time.
+							</p>
+							<a href="https://leetintelligence.com/LEETAPP/UserNearBy.html" target="_blank"
+								class="btn btn-info btn-lg">
+								Alert Map</a>
+
+						</div>
+					</div>
+
+					<div class="col-sm-4">
+						<div class="info">
+							<div class="icon">
+								<i class="fa fa-mobile"></i>
+							</div>
+							<h4 class="info-title">COV19-LA Mobile APP</h4>
+							<p>A Responsive WEB and APP for Everyone! Ready to use at any Locaiton to
+								prevent the spred of COVID19!
+							</p>
+							<a href="#" target="_blank" class="btn btn-info btn-lg">
+								Cov19-LA</a>
+						</div>
+					</div>
+
+					<div class="col-sm-4">
+						<div class="info">
+							<div class="icon">
+								<i class="fa fa-hospital-o"></i>
+							</div>
+							<h4 class="info-title">GET TESTED NOW</h4>
+							<p>Should I get tested? Should I go to the hospital? Which one? COVID-19 APP answers these
+								and other critical questions.</p>
+
+							<a href="https://leetintelligence.com/LEETAPP/UserInput.html" target="_blank"
+								class="btn btn-info btn-lg">
+								Get Tested</a>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<!--     *********    END FEATURES 5      *********      -->
+
+	</div>
+
+	<div class="cd-section" id="blogs">
+
+		<!--     *********     BLOGS 1      *********      -->
+
+		<div class="blogs-1" id="blogs-1">
+			<div class="container">
+				<div class="row">
+
+					<div class="col-md-10 col-md-offset-1">
+
+						<div class="card card-plain card-blog">
+							<div class="row">
+								<div class="col-md-5">
+									<div class="card-image">
+										<div id="map" class="map"></div>
+									</div>
+								</div>
+								<div class="col-md-7">
+									<h3 class="card-title">
+										<a> <i class="fa fa-mobile"></i> COV19-LA APP</a>
+									</h3>
+									<!-- <h2 class="category text-info">Real-Time Alert</h2> -->
+									<!-- <h3 class="card-title">
+										<a>LEET intelligence developed, a location-based COVID map to
+											alert you about COVID cases in your area and prevent to the spread of
+											virous. Organisations can take an action to prevent to the spread of virous
+											before it widespread to other areas</a>
+									</h3> -->
+
+									<!-- <p class="card-description">
+										LEET intelligence developed, a location-based Cov19-LA map to
+										alert you about COVID cases in your area and prevent to the spread of
+										virous. Organisations can take an action to prevent to the spread of virus
+										before it widespread to other areas
+									</p> -->
+									<p class="card-description">
+										<!-- COVID Mobile APP helps you get tested so you can get treatment and isolate
+										yourself at the earliest possible stage if you test positive, or put your mind
+										at ease if you test negative.
+
+										Use COVID Mobile APP to report your symptoms to a nearby hospital. The hospitals
+										can access your location and take action to reach you for early treatment which
+										is how we slow the spread. APP alerts hospitals, healthcare clinics and
+										checkpoints at airports , shopping malls, schools and universities about the
+										location of nearby cases so they can take precautions and be prepared -->
+										COV19-LA Mobile APP helps you get tested so you can get treatment and isolate
+										yourself at the earliest possible stage if you test positive or put your mind at
+										ease if you test negative.
+										Use COV19-LA Mobile APP to report your symptoms to a nearby hospital. The
+										hospital can pinpoint your location and take action to reach you for early
+										treatment which is how we slow the spread.
+										COV19-LA Mobile APP can alert personnel at hospitals, healthcare clinics and
+										checkpoints at airports, shopping malls, schools and universities about the
+										location of nearby cases so they can take precautions. The same personnel can
+										update the COVID-19 database with the data they collect locally.
+
+									</p>
+
+								</div>
+							</div>
+						</div>
+
+						<div class="card card-plain card-blog">
+							<div class="row">
+								<div class="col-md-7">
+
+									<h3 class="card-title">
+										<a>Who should be tested?</a>
+									</h3>
+									<p class="card-description">
+										Should you get tested? Not everyone needs to. Answer these 6-simple yes/no
+										questions to find out.
+									</p>
+
+									<h3 class="card-title">
+										<a>How to get tested?</a>
+									</h3>
+									<p class="card-description">
+										If you have COVID-19 symptoms and want to get tested, COV19-LA Mobile App will
+										direct you to a nearby hospital or try to call hospitals or local health
+										departments or a medical provider for immediate action.
+									</p>
+									<a href="https://leetintelligence.com/LEETAPP/UserInput.html" target="_blank"
+										class="btn btn-info btn-lg">
+										Get Tested</a>
+									<h3 class="card-title">
+										<a>Check points</a>
+									</h3>
+									<p class="card-description">
+										Checkpoints such as Airport, Shopping malls, Educations centers, Convenience
+										Stores, Restaurants, and health camps can use COV19-LA Mobile App to record the
+										COVID-19 symptoms and send to authorized hospitals and health care centers.
+									</p>
+									<a href="https://leetintelligence.com/LEETAPP/CheckpointRegistration.html"
+										target="_blank" class="btn btn-danger btn-lg">
+										Register</a>
+
+									<h3 class="card-title">
+										<a>Hospital</a>
+									</h3>
+									<p class="card-description">
+										Hospital has full authority to access the tested cases location and take action
+										to confirm the positive or negative. Authorized hospital will confirm the
+										infected cases after medical checkup and confirmed SARS-COVID-19 cases will be
+										displayed on the Alert map.
+									</p>
+									<a href="https://leetintelligence.com/LEETAPP/HospitalRegistration.html"
+										target="_blank" class="btn btn-rose btn-lg">
+										Register</a>
+								</div>
+								<div class="col-md-5">
+									<div class="card-image">
+										<!-- <img class="img img-raised" src="assets/img/Covidphone.PNG" /> -->
+										<video autoplay loop muted>
+											<source src="assets/img/Cov19-LA-48sec.mp4" type="video/mp4" />
+										</video>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- <div class="card card-plain card-blog">
+							<div class="row">
+								<div class="col-md-5">
+									<div class="card-image">
+										<img class="img img-raised" src="assets/img/.PNG" />
+									</div>
+								</div>
+								<div class="col-md-7">
+									<h6 class="category text-info">Tips for Prevention</h6>
+									<p class="card-description">
+										Protect yourself, your loved ones and others around you by knowing the facts and
+										taking appropriate precautions. Follow advice provided by your local public
+										health agency. To prevent the spread of COVID-19:
+									</p>
+									<ul>
+										<li>Clean your hands often. Use soap and water, or an alcohol-based hand rub.
+										</li>
+										<li>Maintain a safe distance from anyone who is coughing or sneezing.</li>
+										<li>Don’t touch your eyes, nose or mouth.</li>
+										<li>Cover your nose and mouth with your bent elbow or a tissue when you cough or
+											sneeze.</li>
+										<li>Stay home if you feel unwell.</li>
+										<li>If you have a fever, a cough and difficulty breathing, seek medical
+											attention. Call in advance.</li>
+										<li>Follow the directions of your local health authority.</li>
+										<li>Avoiding unneeded visits to medical facilities allows healthcare systems to
+											operate more effectively, therefore protecting you and others.</li>
+									</ul>
+									<a href="https://leetintelligence.com/LEETAPP/HospitalNearBy.html" target="_blank"
+										class="btn btn-info btn-lg">
+										Get Direct To Hospital</a>
+								</div>
+							</div>
+						</div>
+						<div class="card card-plain card-blog">
+							<div class="row">
+								<div class="col-md-7">
+									<h6 class="category text-danger">
+										Useful videos to prevention
+									</h6>
+									<h3 class="card-title">
+										Seven steps to prevent the spread of the virus
+									</h3>
+									<h3 class="card-title">
+										How to protect yourself against COVID-19?
+									</h3>
+									<h3 class="card-title">
+										What is Novel coronavirus (2019-nCoV)?
+									</h3>
+								</div>
+								<div class="col-md-5">
+									<div class="iframe-container">
+										<iframe src="https://www.youtube.com/embed/9Ay4u7OYOhA" frameborder="0"
+											allowfullscreen height="250"></iframe>
+									</div>
+								</div>
+							</div>
+						</div> -->
+
+
+
+					</div>
+
+				</div>
+
+
+
+			</div>
+		</div>
+
+		<!--     *********    END BLOGS 1      *********      -->
+	</div>
+
+
+	<!--     *********    BIG FOOTER     *********      -->
+
+	<div class="row">
+		<div class="modal" id="supportus">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">
+						<h2 class="modal-title card-title text-center" id="myModalLabel">Support US</h2>
+						<div class="description">
+							<h4 class="info-description">
+								Our COV19-LA Mobile APP and COVID Map is a labor of love. We offer it free of
+								charge. But we do have expenses for website hosting and storage and other
+								essentials like utilities, office supplies, rent…you know how it is. We could
+								use your support.
+								<br><br>
+								Subscribe to our monthly bulletin through <a style="color: blue;"
+									href="https://www.patreon.com/LEETintelligence">Patreon</a>
+								<br><br>
+								Have you got an idea for using location-based data in your business or profession?
+								As a subscriber, you get free consultations with me to help you bring your
+								vision to life.
+								<br><br>
+								Please share this website and APP with your loved ones, family, and friends to
+								prevent the spread of COVID-19, flatten the curve, and save lives.
+							</h4>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-rose" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+
+	<div id="footerjs"></div>
+
+
+</body>
+<script src="navbar.js"></Script>
+<Script src="footer.js"></Script>
+<script>
+	document.getElementById('navbarjs').innerHTML = navbarcontain;
+	document.getElementById('footerjs').innerHTML = footercontain;
+
+</script>
+<script type="text/javascript">
+	$().ready(function () {
+
+		materialKitDemo.initContactUs2Map();
+	});
+</script>
+
+<script type="text/javascript">
+
+	//HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+	var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+		REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+	//source https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+	//confirmed https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+	//recovered https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv 
+	//deaths https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+
+	//Run this function first to get all data from the sources
+	getData();
+
+	async function getData() {
+
+		var confirmed, recovered, deaths;
+
+		await $.ajax({
+			type: 'GET',
+			url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+			dataType: 'text',
+			success: function (response) {
+				confirmed = $.csv.toArrays(response);
+			}
+		});
+
+		await $.ajax({
+			type: 'GET',
+			url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
+			dataType: 'text',
+			success: function (response) {
+				recovered = $.csv.toArrays(response);
+			}
+		});
+
+		await $.ajax({
+			type: 'GET',
+			url: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+			dataType: 'text',
+			success: function (response) {
+				deaths = $.csv.toArrays(response);
+			}
+		});
+
+		// console.log(confirmed);
+		// console.log(recovered);
+		// console.log(deaths);
+
+		//Then get all data, pass all the data to the function addMarkerToMap for show all data as markers on the map
+		await addMarkerToMap(confirmed, recovered, deaths);
+
+	}
+
+	//Below is the function for create markers and info bubbles
+
+	//Grouping markers and info bubbles together
+	var groupMarker = new H.map.Group();
+
+	//Info bubbles
+	groupMarker.addEventListener('tap', function (evt) {
+		var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+			content: evt.target.getData()
+		});
+		//remove info bubble
+		ui.getBubbles().forEach(bub => ui.removeBubble(bub));
+		// show info bubble
+		ui.addBubble(bubble);
+	}, false);
+
+	//Circle marker in SVG
+	// var svgMarkup = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="48" width="48"><circle cx="24" cy="24" r="20" stroke="white" stroke-width="4" fill="${color}" fill-opacity="70%" /><text x="50%" y="50%" fill="black" dominant-baseline="middle" text-anchor="middle">${num}</text></svg>';
+
+	var svgMarkup = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="48" width="48"><circle cx="24" cy="24" r="24" fill="${color}" fill-opacity="70%" /><text x="50%" y="50%" fill="black" dominant-baseline="middle" text-anchor="middle">${num}</text></svg>';
+
+	//Markers
+	function addMarker(icon, coordinate, html) {
+		map.addObject(groupMarker);
+		var marker = new H.map.Marker(coordinate, { icon: icon });
+		marker.setData(html);
+		groupMarker.addObject(marker);
+	}
+
+	//Add markers to map
+	function addMarkerToMap(confirmed, recovered, deaths) {
+
+		for (var i = 1; i < confirmed.length; i++) {
+
+			var num = confirmed[i][confirmed[0].length - 1]; //Latest confirmed cases (last column)
+
+			var color = numToColorLevel(num);
+			var numK = numToK(num);
+
+			var province_state = confirmed[i][0];
+			var country_region = confirmed[i][1];
+			var title = title_text();
+			var lat = confirmed[i][2];
+			var lng = confirmed[i][3];
+
+			function title_text() {
+				var text;
+				if (province_state == '') {
+					text = country_region;
+				} else {
+					text = country_region + '/' + province_state
+				}
+				return text;
+			}
+
+			//The number of records between the 3 data series are not equal.
+			//So I'm using the first 2 columns (Province/State-array0, Country/Region-array1) as the composite keys.
+			//The main table is time_series_covid19_confirmed_global.csv
+
+
+			var numRecovered;
+			for (var j = 1; j < recovered.length; j++) {
+				if (recovered[j][0] == province_state && recovered[j][1] == country_region) {
+					numRecovered = recovered[j][recovered[0].length - 1];
+				}
+			}
+
+			var numDeaths;
+			for (var k = 1; k < deaths.length; k++) {
+				if (deaths[k][0] == province_state && deaths[k][1] == country_region) {
+					numDeaths = deaths[k][deaths[0].length - 1];
+				}
+			}
+
+			// Not including the cruise ships: Diamond Princess, MS Zaandam (lat = 0, lng = 0).
+			// Due to the data source didn't provide lat/lng.
+			if (lat != 0 && lng != 0) {
+
+				var icon = new H.map.Icon(svgMarkup.replace('${color}', color).replace('${num}', numK), { anchor: { x: 24, y: 24 } });
+				addMarker(icon, { lat: lat, lng: lng },
+					'<div style="white-space: nowrap">'
+					+ '<span><b>' + title + '</b></span><br>'
+					+ '<hr>'
+					+ '<span class="orangefont">Confirmed: ' + num + '</span><br>'
+					+ '<span class="greenfont">Recovered: ' + numRecovered + '</span><br>'
+					+ '<span class="redfont">Deaths: ' + numDeaths + '</span>'
+					+ '</div>'
+				);
+
+			}
+
+		}
+
+		// map.getViewModel().setLookAtData({
+		//   bounds: groupMarker.getBoundingBox()
+		// });
+	}
+
+	//Symbolize the markers by number of the latest confirmed cases
+	function numToColorLevel(num) {
+		if (num <= 10) {
+			color = 'LightBlue';
+		} else if (num > 10 && num <= 100) {
+			color = 'LightGreen';
+		} else if (num > 100 && num <= 1000) {
+			color = 'Yellow';
+		} else if (num > 1000 && num <= 10000) {
+			color = 'Orange';
+		} else if (num > 10000 && num <= 100000) {
+			color = 'OrangeRed';
+		} else if (num > 100000) {
+			color = 'Red';
+		}
+		return color;
+	}
+
+	function numToK(num) {
+		if (num <= 999) {
+			numK = num;
+		} else if (num > 999) {
+			numK = (num / 1000);
+			numK = numK.toFixed(0);
+			numK = numK + 'K'
+		}
+		return numK;
+	}
+
+	//https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/reduced.day/14/4823/6160/256/png8?apiKey={YOUR_API_KEY}
+
+	//Below is the general scripts of interactive map
+
+    /**
+     * Boilerplate map initialization code starts below:
+     */
+
+	//Step 1: initialize communication with the platform
+	// In your own code, replace variable window.apikey with your own apikey
+	var platform = new H.service.Platform({
+		apikey: JS_APIKEY
+	});
+	var defaultLayers = platform.createDefaultLayers();
+
+	//Step 2: initialize a map - this map is centered over Europe
+	var map = new H.Map(document.getElementById('map'),
+		defaultLayers.vector.normal.map, {
+		center: { lat: 0, lng: 0 },
+		zoom: 1,
+		pixelRatio: window.devicePixelRatio || 1
+	});
+	// add a resize listener to make sure that the map occupies the whole container
+	window.addEventListener('resize', () => map.getViewPort().resize());
+
+	//Step 3: make the map interactive
+	// MapEvents enables the event system
+	// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+	var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+	// Create the default UI components
+	var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+	// Remove not needed settings control
+	ui.removeControl('mapsettings');
+
+	// Now use the map as required...
+
+	setBaseLayer(map, platform);
+	function setBaseLayer(map, platform) {
+		var mapTileService = platform.getMapTileService({
+			type: 'base'
+		});
+		var parameters = {};
+		var tileLayer = mapTileService.createTileLayer(
+			'maptile',
+			'reduced.day', //change scheme here 
+			256,
+			'png8',
+			parameters
+		);
+		map.setBaseLayer(tileLayer);
+	}
+
+    // normal.day
+    // normal.day.grey
+    // normal.day.transit
+    // normal.day.custom
+    // normal.night
+    // normal.night.grey
+    // pedestrian.day
+    // pedestrian.day.mobile
+    // pedestrian.night
+    // pedestrian.night.mobile
+    // carnav.day.grey
+    // normal.day.mobile
+    // normal.day.grey.mobile
+    // normal.day.transit.mobile
+    // normal.night.mobile
+    // normal.night.grey.mobile
+    // reduced.day
+    // reduced.night
+    // normal.traffic.day
+    // normal.traffic.night
+    // normal.night.transit
+    // normal.night.transit.mobile
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+</html>

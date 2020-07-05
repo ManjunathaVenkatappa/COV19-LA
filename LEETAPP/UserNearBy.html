@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <meta name="description" content="">
+    <title>Covid-19 Maps</title>
+
+    <!-- Load HERE API Code Libraries-->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+    <!-- HERE credentials -->
+    <!-- <script src="credentials.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+    <!-- CSS Files -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+    <script src="assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+
+    <style>
+        .map {
+            width: 100%;
+            height: 90vh;
+        }
+
+        .orangefont {
+            color: orange;
+        }
+
+        .greenfont {
+            color: green;
+        }
+
+        .redfont {
+            color: red;
+        }
+
+        .markerscroll {
+            width: 250px;
+            height: 200px;
+            overflow: scroll;
+        }
+
+        .divscroll {
+            height: 90vh;
+            overflow: scroll;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="navbarjs"></div>
+
+    <div class="section-space"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4 divscroll">
+                <h2>Alert</h2>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <h4>
+                            <p>Total<br><a id="totalcases" style="color: red;"></a></p>
+                        </h4>
+                    </div>
+                    <div class="col-sm-4">
+                        <h4>
+                            <p>Checkpoints<br><a id="totalcheckpoints" style="color: red;"></a></p>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3">
+                        <h4>
+                            <p>Public<br> <a id="publiccases" style="color: red;"></a></p>
+                        </h4>
+                    </div>
+                    <div class="col-sm-3">
+                        <h4>
+                            <p>Today<br> <a id="todaycases" style="color: red;"></a></p>
+                        </h4>
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Details</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-8">
+                <div id="map" class="map"></div>
+            </div>
+        </div>
+
+    </div>
+    <!--     *********    BIG FOOTER     *********      -->
+    <div class="row">
+        <div class="modal" id="supportus">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h2 class="modal-title card-title text-center" id="myModalLabel">Support US</h2>
+                        <div class="description">
+                            <h4 class="info-description">
+                                Our COV19-LA Mobile APP and COVID Map is a labor of love. We offer it free of
+                                charge. But we do have expenses for website hosting and storage and other
+                                essentials like utilities, office supplies, rent…you know how it is. We could
+                                use your support.
+                                <br><br>
+                                Subscribe to our monthly bulletin through <a style="color: blue;"
+                                    href="https://www.patreon.com/LEETintelligence">Patreon</a>
+                                <br><br>
+                                Have you got an idea for using location-based data in your business or profession?
+                                As a subscriber, you get free consultations with me to help you bring your
+                                vision to life.
+                                <br><br>
+                                Please share this website and APP with your loved ones, family, and friends to
+                                prevent the spread of COVID-19, flatten the curve, and save lives.
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-rose" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="footerjs"></div>
+
+
+    <!--     *********   END BIG FOOTER     *********      -->
+
+    <script src="navbar.js"></Script>
+    <Script src="footer.js"></Script>
+    <script>
+        document.getElementById('navbarjs').innerHTML = navbarcontain;
+        document.getElementById('footerjs').innerHTML = footercontain;
+
+    </script>
+    <script>
+        var Todaycases = 0;
+        var Totalcases = 0;
+        var checkpoints = 0;
+        var publicnum = 0;
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        //var lat = parseFloat(url.searchParams.get("lat"));
+        //var lng = parseFloat(url.searchParams.get("lng"));
+        var lat = localStorage.lat;
+        var lng = localStorage.lng;
+        if (lat && lng) {
+            var defaultLat = lat,
+                defaultLng = lng;
+        } else {
+            var defaultLat = 14.075949,
+                defaultLng = 100.614844;
+        }
+        console.log(defaultLat + " ==" + defaultLng);
+
+        $('#cmap').attr('href', 'map.html?lat=' + defaultLat + "&lng=" + defaultLng);
+        $('#uefmap').attr('href', 'UserInput.html?lat=' + defaultLat + "&lng=" + defaultLng);
+        $('#hmap').attr('href', 'HospitalNearBy.html?lat=' + defaultLat + "&lng=" + defaultLng);
+
+
+        //HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+        var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+            REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+        //source https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+        //confirmed https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv
+        //recovered https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv 
+        //deaths https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv
+
+        getData();
+
+        async function getData() {
+
+            await $.ajax({
+                type: 'GET',
+                url: 'https://leetintelligence.com:3000/getperson',
+                success: function (response) {
+                    data = response;
+                }
+            });
+
+            //Then get all data, pass all the data to the function addMarkerToMap for show all data as markers on the map
+            await addMarkerToMap(data, 'R');
+
+            await $.ajax({
+                type: 'GET',
+                url: 'https://leetintelligence.com:3000/checkpoints',
+                success: function (response) {
+                    datac = response;
+                }
+            });
+
+            //Then get all data, pass all the data to the function addMarkerToMap for show all data as markers on the map
+            await addMarkerToMap(datac, 'G');
+
+            $('#todaycases').append(Todaycases);
+            $('#totalcases').append(Totalcases + checkpoints);
+            $('#totalcheckpoints').append(checkpoints);
+            $('#publiccases').append(Totalcases);
+
+
+        }
+
+        //Below is the function for create markers and info bubbles
+
+        //Grouping pins and text together
+        var groupMarker = new H.map.Group();
+
+        //Info bubbles
+        groupMarker.addEventListener('tap', function (evt) {
+            var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+                content: evt.target.getData()
+            });
+            //remove info bubble
+            ui.getBubbles().forEach(bub => ui.removeBubble(bub));
+            // show info bubble
+            ui.addBubble(bubble);
+        }, false);
+
+
+        //Markers
+        function addMarker(icon, coordinate, html) {
+            map.addObject(groupMarker);
+            var marker = new H.map.Marker(coordinate, { icon: icon });
+            marker.setData(html);
+            groupMarker.addObject(marker);
+        }
+
+        //Add markers to map
+        function addMarkerToMap(data, color) {
+
+            if (color == 'R') {
+
+                svgMarkup = '<svg width="${markerWidth}" height="${markerHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+                    + '<circle cx="${markerCx}" cy="${markerCy}" r="${markerRadius}" fill="red" fill-opacity="40%"/></svg>';
+            }
+
+
+            if (color == 'G') {
+                svgMarkup = '<svg width="${markerWidth}" height="${markerHeight}" version="1.1" xmlns="http://www.w3.org/2000/svg">'
+                    + '<circle cx="${markerCx}" cy="${markerCy}" r="${markerRadius}" fill="green" fill-opacity="40%"/></svg>';
+            }
+
+            for (var i = 0; i < data.length; i++) {
+
+                // var num = confirmed[i][confirmed[0].length - 1]; //Latest confirmed cases (last column)
+                var markerRadius = 25;
+                var markerWidthHeight = markerRadius * 2;
+
+                var province_state = data[i].address;
+                var lat = data[i].lat;
+                var lng = data[i].lng;
+                var name = data[i].name;
+                var phone = data[i].phone;
+                var fever = data[i].fever;
+                var cough = data[i].cough;
+                var breath = data[i].breath;
+                var pain = data[i].pain;
+                var taste = data[i].taste;
+                var tired = data[i].tired;
+                var location = data[i].location;
+                var travel = data[i].cntry;
+                var adddate = data[i].adddate;
+
+                var symptoms = [];
+
+                if (fever) symptoms.push("Fever ");
+                if (cough) symptoms.push("Cough ");
+                if (breath) symptoms.push("Shortness of Breath ")
+                if (pain) symptoms.push("Pains ");
+                if (taste) symptoms.push("No Taste ");
+                if (tired) symptoms.push("Tired");
+                if (travel) symptoms.push(" <br>Travel From:" + travel);
+
+                //console.log(province_state);
+                if (color == 'R') {
+
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = today.getFullYear();
+
+                    today = yyyy + '-' + mm + '-' + dd;
+                    if (today == adddate) Todaycases = Todaycases + 1;
+                    Totalcases = Totalcases + 1;
+
+                    if (i > 0) {
+                        if (lat == data[i - 1].lat && lng == data[i - 1].lng) {
+                            markerText = markerText + "<hr>" + '<div style="white-space: nowrap">'
+                                + '<span>Province/State: ' + province_state + '</span><br>'
+                                + 'Name: <b>' + name + '</b><br>'
+                                + "Phone: " + phone + '<br>'
+                                + "Type: " + location + '<br>'
+                                + "Symptons: " + symptoms.join() + '<br>'
+                                + "Updated Date: " + adddate
+                                + '</div>'
+
+                        }
+                        else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                            + '<span>Province/State: ' + province_state + '</span><br>'
+                            + 'Name: <b>' + name + '</b><br>'
+                            + "Phone: " + phone + '<br>'
+                            + "Type: " + location + '<br>'
+                            + "Symptons: " + symptoms.join() + '<br>'
+                            + "Updated Date: " + adddate
+                            + '</div>'
+                    }
+                    else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                        + '<span>Province/State: ' + province_state + '</span><br>'
+                        + 'Name: <b>' + name + '</b><br>'
+                        + "Phone: " + phone + '<br>'
+                        + "Type: " + location + '<br>'
+                        + "Symptons: " + symptoms.join() + '<br>'
+                        + "Updated Date: " + adddate
+                        + '</div>';
+
+                    //Update Table
+                    $('#tbody').append('<tr><td>' + province_state + '</td><td>' + adddate + '</td></tr>');
+                }
+                if (color == 'G') {
+                    checkpoints = checkpoints + 1;
+                    if (i > 0) {
+                        if (lat == data[i - 1].lat && lng == data[i - 1].lng) {
+                            markerText = markerText + "<hr>" + '<div style="white-space: nowrap">'
+                                + '<span>Address: ' + province_state + '</span><br>'
+                                + 'Name: <b>' + name + '</b><br>'
+                                + "Phone: " + phone + '<br>'
+                                + "Updated Date: " + adddate
+                                + '</div>'
+
+                        }
+                        else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                            + '<span>Address: ' + province_state + '</span><br>'
+                            + 'Name: <b>' + name + '</b><br>'
+                            + "Phone: " + phone + '<br>'
+                            + "Updated Date: " + adddate
+                            + '</div>'
+                    }
+                    else markerText = '<div class="markerscroll"><div style="white-space: nowrap">'
+                        + '<span>Address: ' + province_state + '</span><br>'
+                        + 'Name: <b>' + name + '</b><br>'
+                        + "Phone: " + phone + '<br>'
+                        + "Updated Date: " + adddate
+                        + '</div>'
+                }
+
+                // Not including the cruise ships: Diamond Princess, MS Zaandam (lat = 0, lng = 0).
+                // Due to the data source didn't provide lat/lng.
+                if (lat != 0 && lng != 0) {
+
+
+                    // alert(markerText);
+                    if ((i < data.length - 1 && lat != data[i + 1].lat && lng != data[i + 1].lng) || (i == data.length - 1)) {
+                        //alert(data[i].lat+" - "+data[i+1].lat);
+                        markerText = markerText + "</div>"
+                        var icon = new H.map.Icon(svgMarkup.replace('${markerRadius}', markerRadius).replace('${markerWidth}', markerWidthHeight).replace('${markerHeight}', markerWidthHeight).replace('${markerCx}', markerRadius).replace('${markerCy}', markerRadius), { anchor: { x: markerRadius, y: markerRadius } });
+                        addMarker(icon, { lat: lat, lng: lng }, markerText);
+                    }
+                }
+
+            }
+
+            // map.getViewModel().setLookAtData({
+            //   bounds: groupMarker.getBoundingBox()
+            // });
+        }
+
+
+        //Below is the general scripts of interactive map
+
+        /**
+         * Boilerplate map initialization code starts below:
+         */
+
+        //Step 1: initialize communication with the platform
+        // In your own code, replace variable window.apikey with your own apikey
+        var platform = new H.service.Platform({
+            apikey: JS_APIKEY
+        });
+        var defaultLayers = platform.createDefaultLayers();
+
+        //Step 2: initialize a map - this map is centered over Europe
+        var map = new H.Map(document.getElementById('map'),
+            defaultLayers.vector.normal.map, {
+            center: { lat: defaultLat, lng: defaultLng },
+            zoom: 13,
+            pixelRatio: window.devicePixelRatio || 1
+        });
+        // add a resize listener to make sure that the map occupies the whole container
+        window.addEventListener('resize', () => map.getViewPort().resize());
+
+        //Step 3: make the map interactive
+        // MapEvents enables the event system
+        // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+        // Create the default UI components
+        var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+        // Remove not needed settings control
+        ui.removeControl('mapsettings');
+
+    // Now use the map as required...
+
+
+
+    </script>
+    <script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-166797509-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-166797509-1');
+    </script>
+
+
+</body>
+
+</html>

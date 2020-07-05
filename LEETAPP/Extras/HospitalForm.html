@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <!--<link rel="icon" type="image/png" href="assets/img/favicon.png"> -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>LEET</title>
+
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+    <!-- CSS Files -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+
+</head>
+
+<body class="index-page">
+    <nav class="navbar navbar-rose navbar-fixed-top" id="sectionsNav">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">LEET Covid Awareness App</a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                        <li>
+                                <a href="#">
+                                    <i class="#"></i> Covid World MAP
+                                </a>
+                            </li>
+                            <li>
+                                <a href="UserNearBy.html">
+                                    <i class="#"></i> Covid Local MAP
+                                </a>
+                            </li>
+                            <li>
+                                <a href="HospitalNearBy.html">
+                                    <i class="#"></i> Hospital Map
+                                </a>
+                            </li>
+                            <li>
+                                <a href="UserInput.html">
+                                    <i class="#"></i> User Entry Form
+                                </a>
+                            </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="section-space"></div>
+    <div class="container">
+        <form onsubmit="return UpdateHospital();">
+            <div>
+                <h3>Hospital Entry Form</h3>
+            </div>
+            <div class="row">
+                <div class="form-group label-floating has-success">
+                    <input type="text" id="hname" placeholder="Hospital Name" class="form-control" />
+                </div>
+            </div>
+            <!-- <div class="row">
+            <div class="form-group label-floating has-success">
+                <input type="text" id="haddress" placeholder="Full Address" class="form-control" />
+            </div>
+        </div> -->
+            <div class="row">
+                <div class="form-group label-floating has-success">
+                    <input type="text" id="hlocation" placeholder="Full Address" class="form-control" />
+                    <input type="hidden" id="lat" value="1234" required>
+                    <input type="hidden" id="lon" value="1234" required>
+                </div>
+            </div>
+            <div class="row">
+                <a href="#" style="color: blue;">Pin in Map</a>
+                (or) <a href="#" style="color: blue;">Current Location</a>
+            </div>
+            <div class="row">
+                <div id="map" style="height: 200px;"></div>
+            </div>
+
+            <div class="row">
+                <button class="btn btn-success">Submit<div class="ripple-container"></div></button>
+                <button class="btn btn-rose">Cancel<div class="ripple-container"></div></button>
+            </div>
+        </form>
+    </div>
+
+
+</body>
+<!--   Core JS Files   -->
+<script src="assets/js/jquery.min.js" type="text/javascript"></script>
+<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="assets/js/material.min.js"></script>
+
+<!--  Plugin for Date Time Picker and Full Calendar Plugin-->
+<script src="assets/js/moment.min.js"></script>
+
+<!--	Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+<script src="assets/js/nouislider.min.js" type="text/javascript"></script>
+
+<!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
+<script src="assets/js/bootstrap-datetimepicker.js" type="text/javascript"></script>
+
+<!--	Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+<script src="assets/js/bootstrap-selectpicker.js" type="text/javascript"></script>
+
+<!--	Plugin for Tags, full documentation here: http://xoxco.com/projects/code/tagsinput/  -->
+<script src="assets/js/bootstrap-tagsinput.js"></script>
+
+<!--	Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
+<script src="assets/js/jasny-bootstrap.min.js"></script>
+
+<!-- Control Center for Material Kit: activating the ripples, parallax effects, scripts from the example pages etc -->
+<script src="assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+<script type="text/javascript" src='DragMarker.js'></script>
+<script>
+    function UpdateHospital() {
+        var data = {
+            "name": $('#hname').val(),
+            "phone": $('#hphone').val(),
+            "address": $('#hlocation').val(),
+            "lat": $('#lat').val(),
+            "lon": $('#lon').val()
+        }
+        // Fire off the request to /form.php
+        request = $.ajax({
+            url: "https://leetintelligence.com:3000/inserthospital",
+            contentType: 'application/json',
+            type: "post",
+            data: JSON.stringify(data)
+        });
+
+        // Callback handler that will be called on success
+        request.done(function (response, textStatus, jqXHR) {
+            alert("Updated details successfully");
+        });
+
+        // Callback handler that will be called on failure
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            // Log the error to the console
+            alert("Error, Please check the input");
+            console.error(
+                "The following error occurred: " +
+                textStatus, errorThrown
+            );
+        });
+        return false;
+    }
+</script>
+
+</html>

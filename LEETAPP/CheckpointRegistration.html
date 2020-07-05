@@ -1,0 +1,507 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+	<meta name="description" content="">
+	<title>Input hospital information using hospital POIs</title>
+	<!-- Load HERE API Code Libraries-->
+	<link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+	<script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+
+	<!-- HERE credentials -->
+	<!-- Get your credentials from https://developer.here.com -->
+	<!-- <script src="credentials.js"></script> -->
+
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+	<!-- HERE credentials -->
+	<!-- <script src="credentials.js"></script> -->
+
+	<!--     Fonts and icons     -->
+	<link rel="stylesheet" type="text/css"
+		href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script> -->
+	<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/css/material-kit.css?v=1.2.1" rel="stylesheet" />
+	<script src="assets/js/material-kit.js?v=1.2.1" type="text/javascript"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+	<style>
+		.map {
+			background-color: white;
+			width: 100%;
+			height: 50vh;
+		}
+
+		#cotptab {
+			display: none;
+		}
+	</style>
+
+</head>
+
+<body class="login-page">
+	<div id="navbarjs"></div>
+
+	<div class="page-header header-filter">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-5 col-sm-7">
+					<div class="card card-signup">
+						<!---	<form class="form" id="signupform">-->
+						<div class="header header-primary text-center">
+							<h3 class="card-title">Checkpoint Registration</h3>
+						</div>
+						<div class="input-group">
+							<span class="input-group-addon">
+
+							</span>
+						</div>
+
+						<div id="CTab">
+							<form class="form" onsubmit="CPost();return false;">
+								<div class="card-content">
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="text" id="chname" placeholder="Checkpoint Name"
+											class="form-control" required />
+									</div>
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="text" id="chaddress" placeholder="Checkpoint Address"
+											class="form-control" required />
+									</div>
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="email" id="chemail" placeholder="Email"
+											class="form-control" required />
+									</div>
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="text" id="chphone" placeholder="Phone" class="form-control"
+											required />
+									</div>
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="password" id="chpassword" placeholder="Password"
+											class="form-control" required />
+									</div>
+									<div class="input-group">
+										<span class="input-group-addon">
+
+										</span>
+										<input type="password" id="chcpassword" placeholder="Confirm Password"
+											class="form-control" required />
+									</div>
+									<br>
+									*Drag and drop the green pin to your checkpoint location.
+								</div>
+								<div class="footer text-center">
+									<!-- <button type="button" onclick="Login()"
+									class="btn btn-primary btn-simple btn-wd btn-lg">Login</button> -->
+
+									<button type="button" id="cbotp" class="btn btn-primary btn-simple btn-wd btn-lg"
+										onclick="otp('C');">Send OTP</button>
+									<div id="cotptab">
+										<input type="text" id="cotp" placeholder="Enter OTP"><br>
+										<button type="button" class="btn btn-primary btn-simple btn-wd btn-lg"
+											onclick="CPost();">Register</button>
+
+									</div>
+								</div>
+							</form>
+						</div>
+						<!--</form>-->
+					</div>
+				</div>
+				<div class="col-md-7 col-sm-5">
+					<!-- DIV for map display -->
+					<div id="map" class="map"></div>
+					<input type="hidden" id="lat" onblur="moveMarkerByInputForm()" min="-90" max="+90" size="30">
+					<input type="hidden" id="lng" onblur="moveMarkerByInputForm()" min="-180" max="+180" size="30">
+					<input type="hidden" id="address">
+
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="modal" id="supportus">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-body">
+							<h2 class="modal-title card-title text-center" id="myModalLabel">Support US</h2>
+							<div class="description">
+								<h4 class="info-description">
+									Our COV19-LA Mobile APP and COVID Map is a labor of love. We offer it free of
+									charge. But we do have expenses for website hosting and storage and other
+									essentials like utilities, office supplies, rent…you know how it is. We could
+									use your support.
+									<br><br>
+									Subscribe to our monthly bulletin through <a style="color: blue;"
+										href="https://www.patreon.com/LEETintelligence">Patreon</a>
+									<br><br>
+									Have you got an idea for using location-based data in your business or profession?
+									As a subscriber, you get free consultations with me to help you bring your
+									vision to life.
+									<br><br>
+									Please share this website and APP with your loved ones, family, and friends to
+									prevent the spread of COVID-19, flatten the curve, and save lives.
+								</h4>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-rose" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+		</div>
+
+		<div id="footerjs"></div>
+
+
+	</div>
+	<!-- DIV for map display -->
+
+	<script src="navbar.js"></Script>
+	<Script src="footer.js"></Script>
+	<script>
+		document.getElementById('navbarjs').innerHTML = navbarcontain;
+		document.getElementById('footerjs').innerHTML = footercontain;
+
+	</script>
+
+	<script type="text/javascript">
+
+		// HERE credentials - https://developer.here.com - manjursgee@gmail.com - Freemium - Transactions per month 250K
+		var JS_APIKEY = 'mFIKL7_dKD4sTrqcvxdg6hpKw8x8yz9aOetOQV-_PYE',
+			REST_APIKEY = 'Pvk8ZMAwP_NHHans8F_XURDu8XYiHC_UYewt1bKTX1A';
+
+		//Hide-Show the panel 
+		function togglePanel() {
+			var x = document.getElementById('panel');
+			if (x.style.display === 'none') {
+				x.style.display = 'block';
+			} else {
+				x.style.display = 'none';
+			}
+		}
+
+		//Remove the previous marker before the new request 
+		function removeResult() {
+			groupMarker.removeAll();
+		}
+
+		//The default position is used in the case unable to retrieve location from the HTML5 Geolocation API
+		//14.075949, 100.614844 @AIT
+		// var defaultLat = 14.075949,
+		// 	defaultLng = 100.614844;
+		var defaultLat = parseFloat(localStorage.lat),
+			defaultLng = parseFloat(localStorage.lng);
+		var lat = defaultLat,
+			lng = defaultLng;
+
+		//HTML5 Geolocation API
+		//findCurrentPosition();
+		function findCurrentPosition() {
+			function success(position) {
+				let lat = position.coords.latitude,
+					lng = position.coords.longitude;
+
+				//Call this function to add a draggable marker to the map
+				addDraggableMarker(map, behavior, lat, lng);
+				map.setZoom(14);
+			}
+			function error() {
+				switch (error.code) {
+					case error.PERMISSION_DENIED:
+						alert("User denied the request for Geolocation.");
+						break;
+					case error.POSITION_UNAVAILABLE:
+						alert("Location information is unavailable.");
+						break;
+					case error.TIMEOUT:
+						alert("The request to get user location timed out.");
+						break;
+					case error.UNKNOWN_ERROR:
+						alert("An unknown error occurred.");
+						break;
+				}
+				//Call this function to add a draggable marker to the map
+				addDraggableMarker(map, behavior, defaultLat, defaultLng);
+				map.setZoom(14);
+			}
+			if (!navigator.geolocation) {
+				alert('Geolocation is not supported by your browser.');
+				//Call this function to add a draggable marker to the map
+				addDraggableMarker(map, behavior, defaultLat, defaultLng);
+				map.setZoom(14);
+			} else {
+				navigator.geolocation.getCurrentPosition(success, error);
+			}
+		}
+
+		// jQueryUI - Autocomplete https://www.tutorialspoint.com/jqueryui/jqueryui_autocomplete.htm
+		// Place Autosuggest - https://developer.here.com/documentation/places/dev_guide/topics_api/resource-autosuggest.html
+
+
+		//Draggable Marker 
+		var groupMarker = new H.map.Group(),
+			marker;
+		//Adds a draggable marker to the map
+		function addDraggableMarker(map, behavior, lat, lng) {
+			marker = new H.map.Marker({ lat: lat, lng: lng }, {
+				// mark the object as volatile for the smooth dragging
+				volatility: true
+			});
+			// Ensure that the marker can receive drag events
+			marker.draggable = true;
+			map.addObject(groupMarker);
+			groupMarker.addObject(marker);
+			map.setCenter({ lat: lat, lng: lng });
+
+			// disable the default draggability of the underlying map
+			// and calculate the offset between mouse and target's position
+			// when starting to drag a marker object:
+			map.addEventListener('dragstart', function (ev) {
+				var target = ev.target,
+					pointer = ev.currentPointer;
+				if (target instanceof H.map.Marker) {
+					var targetPosition = map.geoToScreen(target.getGeometry());
+					target['offset'] = new H.math.Point(pointer.viewportX - targetPosition.x, pointer.viewportY - targetPosition.y);
+					behavior.disable();
+				}
+			}, false);
+
+			// re-enable the default draggability of the underlying map
+			// when dragging has completed
+			map.addEventListener('dragend', function (ev) {
+				var target = ev.target;
+				if (target instanceof H.map.Marker) {
+					behavior.enable();
+				}
+
+				//Update data in the form with the position from the draggable marker
+				let geometry = marker.getGeometry(),
+					lat = geometry.lat,
+					lng = geometry.lng;
+
+				document.getElementById('lat').value = lat;
+				document.getElementById('lng').value = lng;
+
+			}, false);
+
+			// Listen to the drag event and move the position of the marker
+			// as necessary
+			map.addEventListener('drag', function (ev) {
+				var target = ev.target,
+					pointer = ev.currentPointer;
+				if (target instanceof H.map.Marker) {
+					target.setGeometry(map.screenToGeo(pointer.viewportX - target['offset'].x, pointer.viewportY - target['offset'].y));
+				}
+			}, false);
+		}
+
+		//Update position of the draggable marker with the lat/lng data in the form
+		function moveMarkerByInputForm() {
+			let lat = document.getElementById('lat').value,
+				lng = document.getElementById('lng').value;
+			marker.setGeometry({ lat: lat, lng: lng });
+			map.setCenter({ lat: lat, lng: lng });
+		}
+
+		//Below is the general scripts of interactive map
+
+        /**
+         * Boilerplate map initialization code starts below:
+         */
+
+		//Step 1: initialize communication with the platform
+		// In your own code, replace variable window.apikey with your own apikey
+		var platform = new H.service.Platform({
+			apikey: JS_APIKEY
+		});
+		var defaultLayers = platform.createDefaultLayers();
+
+		//Step 2: initialize a map - this map is centered over Europe
+		var map = new H.Map(document.getElementById('map'),
+			defaultLayers.vector.normal.map, {
+			center: { lat: 0, lng: 0 },
+			zoom: 1,
+			pixelRatio: window.devicePixelRatio || 1
+		});
+		// add a resize listener to make sure that the map occupies the whole container
+		window.addEventListener('resize', () => map.getViewPort().resize());
+
+		//Step 3: make the map interactive
+		// MapEvents enables the event system
+		// Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+		var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+		// Create the default UI components
+		var ui = H.ui.UI.createDefault(map, defaultLayers);
+
+        // Remove not needed settings control
+        // ui.removeControl('mapsettings');
+
+        // Now use the map as required...
+
+	</script>
+
+
+	<!--Form Submit-->
+	<script>
+		function CPost() {
+			var name = $('#chname').val();
+			var haddress = $('#chaddress').val();
+			var chemail = $('#chemail').val();
+			var phone = $('#chphone').val();
+			var password = $('#chpassword').val();
+			var cpassword = $('#chcpassword').val();
+			var lat = $('#lat').val();
+			var lng = $('#lng').val();
+			var otp = $('#cotp').val();
+			var caddress = haddress;
+			data = {
+				password: password,
+				name: name,
+				address: haddress,
+				caddress: caddress,
+				lat: lat,
+				lng: lng,
+				email: email,
+				phone: phone,
+				otp: otp,
+				usertype: "C"
+			}
+			console.log(data);
+			request = $.ajax({
+				url: "https://leetintelligence.com:3000/inserthospitaluser",
+				contentType: 'application/json',
+				type: "post",
+				data: JSON.stringify(data)
+			});
+			// Callback handler that will be called on success
+			request.done(function (response, textStatus, jqXHR) {
+				// Log a message to the console
+				if (response) {
+					// alert("Redirecting to Login Page");
+					// //localStorage.setItem("LoginToken", response);
+					// location.href = "https://leetintelligence.com/LEETAPP/login-page.html";
+					// if (response == "Updated") DirectToUser();
+					//     else alert(response);
+					if (response != "error") {
+						alert("Please note your UserID: " + response);
+						DirectToHospital();
+					}
+					else alert("Error! please check your information");
+				}
+				else {
+					alert("Error! please check your username and password");
+				}
+			});
+
+			// Callback handler that will be called on failure
+			request.fail(function (jqXHR, textStatus, errorThrown) {
+				// Log the error to the console
+				alert("Error");
+			});
+
+			return false;
+		}
+	</script>
+	<script>
+		function DirectToUser() {
+			var result = confirm("Thank you. Please add Infected  Cases to stop the spread of COVID Pandemic.");
+			if (result == true) {
+				locatin.href = 'https://leetintelligence.com/LEETAPP/UserInput.html';
+			}
+			else location.reload();
+		}
+
+		function phonenumberv(inputtxt) {
+			var phoneno = /^\+?([0-9]{2})\)?(([0-9]{9})|([0-9]{10}))$/;
+			if ((inputtxt.match(phoneno))) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		function otp(val) {
+			checkflag = 0;
+			if (val == 'C') {
+				var phonenumber = $('#chphone').val();
+				if (!phonenumberv(phonenumber)) alert("Invalid Phone Number");
+				else var result = confirm("Please Verify your Phone Number: " + phonenumber);
+				if (result == true && phonenumberv(phonenumber)) {
+					$('#cbotp').hide();
+					$('#cotptab').show();
+					checkflag = 1;
+				}
+			}
+			if (checkflag == 1) {
+				request = $.ajax({
+					url: "https://leetintelligence.com:3000/otp",
+					contentType: 'application/json',
+					type: "post",
+					data: JSON.stringify({ phone: phonenumber })
+				});
+				// Callback handler that will be called on success
+				request.done(function (response, textStatus, jqXHR) {
+					// Log a message to the console
+					if (response) {
+						if (response == "OTP Send") alert("LEETintelligence sent the COVID Security Code to your Phone. Please verify to stop the spread of COVID Pandemic and Save the live.");
+						else alert("Invalid Data");
+					}
+					else {
+						alert("Invalid information");
+					}
+				});
+
+				// Callback handler that will be called on failure
+				request.fail(function (jqXHR, textStatus, errorThrown) {
+					// Log the error to the console
+					alert("Error");
+				});
+			}
+		}
+		addDraggableMarker(map, behavior, lat, lng);
+		map.setZoom(14);
+	</script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166797509-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'UA-166797509-1');
+	</script>
+
+
+</body>
+
+</html>
